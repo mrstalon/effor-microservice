@@ -1,36 +1,40 @@
 <template>
-  <div class="container">
-      <header>
-          <a href="https://new.effor.by/home">
-              <img src="../assets/header_logo.jpg" alt="Could not load an image" class="header-logo-img">
-          </a>
-          <button class="user-profile-container">
-              <img src="../assets/avatar_default.png" alt="Could not load and image" class="avatar-logo-img">
-              <p>Анна</p>
-          </button>
-      </header>
+    <div class="container" v-on:click="hideShowedComponents">
+        <About v-if="showModal" @close="showModal = false"/>
+        <header>
+            <a href="https://new.effor.by/home">
+                <img src="../assets/header_logo.jpg" alt="Could not load an image" class="header-logo-img">
+            </a>
+            <div class="user-profile-container">
+                <button class="user-info-button" v-on:click="showNavComponent">
+                  <img src="../assets/avatar_default.png" alt="Could not load an image" class="avatar-logo-img">
+                  <p>{{this.$store.state.userName}}</p>
+                </button>
+                <Nav v-if="showNav"/>
+            </div>
+        </header>
 
-      <main>
+        <main>
 
-      </main>
+        </main>
 
-      <footer>
-          <div>
-              <p class="footer-text">
+        <footer>
+            <div>
+                <p class="footer-text">
                   © <a href="https://new.effor.by/home">Интеллект Онлайн, </a> 2014-2017
-              </p>
-          </div>
+                </p>
+            </div>
 
-          <button class="about-button">
-              <div class="about-logo">
-                  i
-              </div>
-              <p>
-                  О платформе
-              </p>
-          </button>
-      </footer>
-  </div>
+            <button class="about-button" v-on:click="showAboutInfo">
+                <div class="about-logo">
+                    i
+                </div>
+                <p>
+                    О платформе
+                </p>
+            </button>
+        </footer>
+    </div>
 </template>
 
 
@@ -38,9 +42,27 @@
 import {router} from '../main.js';
 
 export default {
+    data() {
+        return {
+            showModal: false,
+            showNav: false,
+        }
+    },
     methods: {
         redirect(url) {
             router.push(url);
+        },
+        showAboutInfo(e) {
+            this.showModal = true;
+            e.stopPropagation();
+        },
+        showNavComponent(e) {
+            this.showNav = !this.showNav;
+            e.stopPropagation();
+        },
+        hideShowedComponents() {
+            this.showNav = false;
+            this.showModal = false;
         }
     }
 }
@@ -75,29 +97,48 @@ header > a {
     margin-left: 10px;
 }
 
-header > button {
-    background: none;
-    border: 0;
+.user-profile-container {
     margin-right: 20px;
-    font-size: 20px;
-    color: #898887;
-    font-family: Philosopher, sans-serif;
-    font-weight: 700;
-    width: 100px;
     height: 40px;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
+    width: auto;
+    min-width: 100px;
     justify-content: space-between;
 }
 
-header > button:hover {
+.user-profile-container > button:hover {
     cursor: pointer;
     color: #ff8d00;
 }
 
-header > button > p {
+.user-info-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    color: #898887;
+    font-family: Philosopher, sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    background: none;
+    border: 0;
+}
+
+.user-info-button > p {
     margin: 6px;
+}
+
+.nav-container {
+    position: absolute;
+    right: 0;
+    border-radius: 3px;
+    border: 1px black solid;
+    top: 55px;
+    width: 170px;
+    height: 320px;
+    background-color: white;
 }
 
 .avatar-logo-img {
@@ -107,6 +148,13 @@ header > button > p {
     border-radius: 17px;
     margin-right: 5px;
 }
+
+.user-profile-info {
+    display: flex;
+    flex-direction: row;
+}
+
+
 
 main {
     height: 690px;
@@ -152,9 +200,10 @@ footer > div {
 }
 
 .about-logo {
-    height: 22px;
-    width: 22px;
-    margin: -4px 4px 0 0;
+    height: 20px;
+    width: 20px;
+    margin-top: 1px;
+    margin-right: 3px;
     float: left;
     border-radius: 100%;
     border: 1px solid #898887;

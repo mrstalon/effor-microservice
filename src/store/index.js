@@ -1,6 +1,6 @@
 const store = {
     state: {
-
+        userName: 'Анна',
     },
     mutations: {
 

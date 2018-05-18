@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^0.17.1",
     "fs": "0.0.1-security",
+    "npm": "^6.0.1",
     "url-loader": "^1.0.1",
     "vue": "^2.5.11",
     "vue-router": "^3.0.1",
