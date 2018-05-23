@@ -1,16 +1,14 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import Vuex from 'vuex';
+
 import storage from './store';
 import Menu from './view/Menu.vue';
-import About from './view/About.vue';
-import Nav from './view/Nav.vue';
+import Form from './view/Form.vue';
 import './styles/main.css';
 
 Vue.use(VueRouter);
 Vue.use(Vuex);
-Vue.component('About', About);
-Vue.component('Nav', Nav);
 
 export const store = new Vuex.Store(storage);
 
@@ -19,6 +17,10 @@ export const router = new VueRouter({
         {
             path: '/',
             component: Menu,
+        },
+        {
+            path: '/form',
+            component: Form,
         },
     ],
 });

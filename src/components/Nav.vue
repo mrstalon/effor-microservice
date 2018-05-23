@@ -53,13 +53,8 @@
 
 
 <script>
-import {router} from '../main.js';
-
 export default {
     methods: {
-        redirect(url) {
-            router.push(url);
-        },
     }
 }
 </script>
@@ -68,6 +63,7 @@ export default {
 
 .nav-container {
     display: flex;
+    z-index: 100;
     flex-direction: column;
 }
 

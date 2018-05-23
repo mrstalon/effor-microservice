@@ -15,7 +15,7 @@
         </header>
 
         <main>
-
+            <MainContent />
         </main>
 
         <footer>
@@ -39,9 +39,16 @@
 
 
 <script>
-import {router} from '../main.js';
+import About from '../components/About.vue';
+import MainContent from '../components/MainContent.vue';
+import Nav from '../components/Nav.vue';
 
 export default {
+    components: {
+        About,
+        MainContent,
+        Nav,
+    },
     data() {
         return {
             showModal: false,
@@ -49,15 +56,13 @@ export default {
         }
     },
     methods: {
-        redirect(url) {
-            router.push(url);
-        },
         showAboutInfo(e) {
             this.showModal = true;
             e.stopPropagation();
         },
         showNavComponent(e) {
             this.showNav = !this.showNav;
+            console.log(this.showNav);
             e.stopPropagation();
         },
         hideShowedComponents() {
@@ -159,6 +164,7 @@ header > a {
 main {
     height: 690px;
     background: url('../assets/main_background.jpg');
+    overflow: scroll;
 }
 
 footer {
