@@ -45,9 +45,41 @@ const quickParallelsSort = function quickParallelSort(array) {
     return quickParallelsSort(arrayOfSmaller).concat(obj).concat(quickParallelsSort(arrayOfBigger));
 };
 
+const quickTeacherClassesSort = function quickTeacherClassesSort(array) {
+    if (array.length <= 1) {
+        return array;
+    }
+
+    const random = Math.round(Math.random(0, array.length));
+    const pivot = array[random];
+
+    const arrayOfBigger = array.filter((item) => {
+        if (item.parNumber > pivot.parNumber) {
+            return item;
+        } else if (item.parNumber === pivot.parNumber) {
+            if (item.classLetter > pivot.classLetter) {
+                return item;
+            }
+        }
+    });
+
+    const arrayOfSmaller = array.filter((item) => {
+        if (item.parNumber < pivot.parNumber) {
+            return item;
+        } else if (item.parNumber === pivot.parNumber) {
+            if (item.classLetter < pivot.classLetter) {
+                return item;
+            }
+        }
+    });
+
+    return quickTeacherClassesSort(arrayOfSmaller).concat(pivot).concat(quickTeacherClassesSort(arrayOfBigger));
+};
+
 const functionsToExport = {
     quickAlphabetSort,
     quickParallelsSort,
+    quickTeacherClassesSort,
 };
 
 export default functionsToExport;

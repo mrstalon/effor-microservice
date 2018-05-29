@@ -19,13 +19,14 @@
                             <span
                             v-for="(classObj, classId) in this.$store.state.choosedParallel.classes"
                             v-bind:key="classId"
-                            v-bind:class="[classObj.isChoosed ? 'class-is-choosed' : 'class-is-not-choosed']">
+                            v-bind:class="[classObj.isChoosed ? 'class-is-choosed' : 'class-is-not-choosed']"
+                            @click="chooseLetter(classObj.letter)">
                                 {{classObj.letter}}
                             </span>
                         </div>
                     </div>
                     <div class="buttons-container">
-                        <button>Назначить</button>
+                        <button @click="approveTeacherChanges">Назначить</button>
                         <button @click="$emit('close')">Закрыть</button>
                     </div>
                 </div>
@@ -37,16 +38,13 @@
 
 <script>
 export default {
-    beforeMount() {
-        console.log(this.$store.state.parallels);
-    },
     beforeDestroy() {
-        this.$store.commit('clearChoosedParallel');
-        this.$store.commit('clearChoosedTeacher');
+        this.$store.commit('clearTempVariables');
     },
     data() {
         return {
             isParallelChoosed: null,
+            choosedParallelId: null,
         }
     },
     methods: {
@@ -56,7 +54,15 @@ export default {
         chooseParallel(parId) {
             this.$store.commit('chooseParallel', parId);
             this.isParallelChoosed = true;
-        }
+            this.choosedParallelId = parId;
+        },
+        chooseLetter(letter) {
+            this.$store.commit('chooseLetter', {parId: this.choosedParallelId, letter: letter});
+        },
+        approveTeacherChanges() {
+            this.$store.commit('approveTeacherChanges');
+            this.$emit('close');
+        },
     }
 }
 </script>

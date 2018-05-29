@@ -129,7 +129,7 @@ const parallels = [
             },
             {
                 letter: 'Г',
-            }
+            },
         ],
     },
 ];

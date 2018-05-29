@@ -11,7 +11,7 @@
                         <span
                         v-for="(letter, letterId) in this.$store.state.alphabet"
                         v-bind:key="letterId"
-                        v-bind:class="[letter.isClicked ? 'letter-is-choosed' : 'letter-is-not-choosed']"
+                        v-bind:class="[letter.isChoosed ? 'letter-is-choosed' : 'letter-is-not-choosed']"
                         @click="checkShouldWeAddOrDeleteLetter(letter.letter, letterId)"
                         >{{letter.letter}}</span>
                     </div>
@@ -30,7 +30,7 @@
 export default {
     props: ['parNumber', 'parId'],
     beforeMount() {
-        this.$store.commit('lightClassesLettersInAlphabet', this.parId);
+        this.$store.commit('lightChoosedClassesLettersInAlphabet', this.parId);
         this.$store.commit('fillArrayOfLettersToAdd', this.parId);
     },
     beforeDestroy() {
@@ -47,14 +47,11 @@ export default {
         },
         checkShouldWeAddOrDeleteLetter(letter, letterId) {
             if (this.$store.state.arrayOfLettersToAdd.includes(letter)) {
-                console.log('includes');
                 this.$store.commit('deleteLetterFromArrayOfLetters', letter);
-                this.$store.commit('changeIsLetterClicked', letterId);
             } else {
-                console.log('not includes');
                 this.$store.commit('addLetterToArrayOfLetters', letter);
-                this.$store.commit('changeIsLetterClicked', letterId);
             }
+            this.$store.commit('changeIsLetterChoosed', letterId);
         },
         checkShouldWeApproveChanges() {
             if (this.$store.state.arrayOfLettersToAdd.length > 0) {

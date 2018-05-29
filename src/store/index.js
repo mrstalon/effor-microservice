@@ -3,8 +3,7 @@ import teachers from './teachers';
 import parallels from './parallels';
 import sortFunctions from './quickSorts';
 
-const quickAlphabetSort = sortFunctions.quickAlphabetSort;
-const quickParallelSort = sortFunctions.quickParallelsSort;
+const { quickAlphabetSort, quickParallelSort, quickTeacherClassesSort } = sortFunctions;
 
 function removeElementFromArray(array, element) {
     const index = array.indexOf(element);
@@ -25,6 +24,7 @@ const store = {
         arrayOfLettersToAdd: [],
         choosedParallel: null,
         tempTeacher: null,
+        tempClasses: null,
     },
     mutations: {
         addLetterToArrayOfLetters(state, letter) {
@@ -38,7 +38,7 @@ const store = {
                 number: parToAddNumber,
             };
 
-            const classes = state.arrayOfLettersToAdd.map((item) => {
+            const classes = JSON.parse(JSON.stringify(state.arrayOfLettersToAdd)).map((item) => {
                 return {
                     letter: item,
                 };
@@ -54,31 +54,35 @@ const store = {
         },
         makeStateOfAlphabetInitial(state) {
             state.alphabet = state.alphabet.map((item) => {
-                item.isClicked = false;
-                return item;
+                return {
+                    ...item,
+                    isChoosed: false,
+                };
             });
         },
-        changeIsLetterClicked(state, letterId) {
-            state.alphabet[letterId].isClicked = !state.alphabet[letterId].isClicked;
+        changeIsLetterChoosed(state, letterId) {
+            const newAlphabet = JSON.parse(JSON.stringify(state.alphabet));
+            newAlphabet[letterId].isChoosed = !newAlphabet[letterId].isChoosed;
+            state.alphabet = newAlphabet;
         },
         sortArrayOfLetters(state) {
             state.arrayOfLettersToAdd = quickAlphabetSort(state.arrayOfLettersToAdd);
         },
-        lightClassesLettersInAlphabet(state, parNumber) {
-            const parallel = state.parallels[parNumber];
-            const classesLetters = parallel.classes.map((item) => {
+        lightChoosedClassesLettersInAlphabet(state, parNumber) {
+            const classesLetters = JSON.parse(JSON.stringify(state.parallels[parNumber].classes)).map((item) => {
                 return item.letter;
             });
 
-
             let i = 0;
             const arrayOfLettersLength = classesLetters.length;
-            let newAlphabet = [].concat(state.alphabet);
+            let newAlphabet = JSON.parse(JSON.stringify(state.alphabet));
             while (arrayOfLettersLength > i) {
                 newAlphabet = newAlphabet.map((item) => {
                     if (item.letter === classesLetters[0]) {
-                        item.isClicked = true;
-                        return item;
+                        return {
+                            ...item,
+                            isChoosed: true,
+                        };
                     }
                     return item;
                 });
@@ -88,16 +92,16 @@ const store = {
             state.alphabet = newAlphabet;
         },
         fillArrayOfLettersToAdd(state, parId) {
-            const parallel = state.parallels[parId];
-            state.arrayOfLettersToAdd = parallel.classes.map((item) => {
+            // filling arrayOfLettersToAdd with already added letters(making arrayOfLettersToAdd state initial)
+            state.arrayOfLettersToAdd = JSON.parse(JSON.stringify(state.parallels[parId].classes)).map((item) => {
                 return item.letter;
             });
         },
         approveParallelChanges(state, payload) {
-            const parId = payload.parId;
-            const parNumber = payload.parNumber;
+            // approving changes of parallel data
+            const { parId, parNumber } = payload;
 
-            const classes = state.arrayOfLettersToAdd.map((item) => {
+            const classes = JSON.parse(JSON.stringify(state.arrayOfLettersToAdd)).map((item) => {
                 return {
                     letter: item,
                 };
@@ -111,59 +115,101 @@ const store = {
             state.parallels.splice(parId, 1, newParallel);
         },
         changeChoosedTeacher(state, newTeacherId) {
-            const choosedTeacher = Object.assign({}, state.teachers[newTeacherId]);
-            let tempParallels = [].concat(state.parallels);
-            console.log(tempParallels === state.parallels);
+            // changing choosed teacher + lighting parallels and classes teached by this teacher
+            const newChoosedTeacher = JSON.parse(JSON.stringify(state.teachers[newTeacherId]));
+            let newTempParallels = JSON.parse(JSON.stringify(state.parallels));
 
-            tempParallels = tempParallels.map((item) => {
-                item.isChoosed = false;
-                item.isTeached = false;
-                return item;
+            newTempParallels = newTempParallels.map((item) => {
+                return {
+                    ...item,
+                    isChoosed: false,
+                    isTeached: false,
+                };
             });
 
-            choosedTeacher.classes.forEach((item) => {
-                tempParallels[item.parNumber - 1].isTeached = true;
+            newChoosedTeacher.classes.forEach((item) => {
+                newTempParallels[item.parNumber - 1].isTeached = true;
             });
 
-            tempParallels = tempParallels.map((item) => {
-                item.classes = item.classes.map((subItem) => {
-                    return {
-                        letter: subItem.letter,
-                    };
-                });
-                return item;
+            newTempParallels = newTempParallels.map((item) => {
+                return {
+                    ...item,
+                    classes: item.classes.map((subItem) => {
+                        return {
+                            letter: subItem.letter,
+                        };
+                    }),
+                };
             });
 
-            choosedTeacher.classes.forEach((item) => {
-                const id = tempParallels[item.parNumber - 1].classes.findIndex((classObj) => {
+            newChoosedTeacher.classes.forEach((item) => {
+                const id = newTempParallels[item.parNumber - 1].classes.findIndex((classObj) => {
                     return classObj.letter === item.classLetter;
                 });
                 if (id >= 0) {
-                    tempParallels[item.parNumber - 1].classes[id].isChoosed = true;
+                    newTempParallels[item.parNumber - 1].classes[id].isChoosed = true;
                 }
             });
 
-            choosedTeacher.tempParallels = tempParallels;
+            newChoosedTeacher.tempParallels = newTempParallels;
 
-            state.tempTeacher = choosedTeacher;
-            console.log(choosedTeacher);
+            state.tempTeacher = newChoosedTeacher;
+            state.tempClasses = JSON.parse(JSON.stringify(state.tempTeacher.classes));
         },
-        clearChoosedTeacher(state) {
+        clearTempVariables(state) {
+            state.choosedParallel = null;
+            state.tempClasses = null;
             state.tempTeacher = null;
         },
-        clearChoosedParallel(state) {
-            state.choosedParallel = null;
-        },
         chooseParallel(state, parId) {
-            const tempTeacher = Object.assign({}, state.tempTeacher);
-            tempTeacher.tempParallels = tempTeacher.tempParallels.map((parallel) => {
-                parallel.isChoosed = false;
-                return parallel;
+            // changing choosed parallel
+            const newTempTeacher = JSON.parse(JSON.stringify(state.tempTeacher));
+            newTempTeacher.tempParallels = newTempTeacher.tempParallels.map((parallel) => {
+                return {
+                    ...parallel,
+                    isChoosed: false,
+                };
             });
 
-            tempTeacher.tempParallels[parId].isChoosed = !state.tempTeacher.tempParallels[parId].isChoosed;
-            state.tempTeacher = tempTeacher;
+            newTempTeacher.tempParallels[parId].isChoosed = !state.tempTeacher.tempParallels[parId].isChoosed;
+            state.tempTeacher = newTempTeacher;
             state.choosedParallel = state.tempTeacher.tempParallels[parId];
+        },
+        chooseLetter(state, payload) {
+            const { parId, letter } = payload;
+            const letterId = state.choosedParallel.classes.findIndex((item) => {
+                return item.letter === letter;
+            });
+
+            if (state.choosedParallel.classes[letterId].isChoosed === true) {
+                // deleting this class from tempClasses and set isChoosed of this letter to false
+                const classId = state.tempClasses.findIndex((classObj) => {
+                    return classObj.classLetter === letter;
+                });
+                state.tempClasses.splice(classId, 1);
+                const choosedParallel = JSON.parse(JSON.stringify(state.choosedParallel));
+                choosedParallel.classes[letterId].isChoosed = false;
+                state.choosedParallel = choosedParallel;
+            } else {
+                // adding this class to tempClasses and set isChoosed of this letter to true
+                state.tempClasses.push({
+                    parNumber: parId + 1,
+                    classLetter: letter,
+                });
+                const choosedParallel = JSON.parse(JSON.stringify(state.choosedParallel));
+                choosedParallel.classes[letterId].isChoosed = true;
+                state.choosedParallel = choosedParallel;
+            }
+        },
+        approveTeacherChanges(state) {
+            // approving changes of teacher data
+            const tempTeacher = JSON.parse(JSON.stringify(state.tempTeacher));
+            const newTeacher = {
+                name: tempTeacher.name,
+                id: tempTeacher.id,
+                classes: quickTeacherClassesSort(JSON.parse(JSON.stringify(state.tempClasses))),
+            };
+            state.teachers.splice(tempTeacher.id, 1, newTeacher);
         },
     },
     actions: {
