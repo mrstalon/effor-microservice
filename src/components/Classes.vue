@@ -1,18 +1,24 @@
 <template>
     <div class="classes-container">
-        <button class="add-parallel-button" v-on:click="showAddParallel">Добавить параллель</button>
+        <button class="add-parallel-button" v-on:click="showAddParallelMenu">Добавить параллель</button>
         <AddParallelMenu v-if="isAddParallelMenuShown" @close="isAddParallelMenuShown = false"/>
+        <EditParallelMenu
+        v-if="isEditParallelMenuShown"
+        @close="isEditParallelMenuShown = false"
+        v-bind:parNumber="choosedParallelNumber"
+        v-bind:parId="choosedParallelId"
+        />
         <table class="classes-info-table">
             <tr class="classes-info-table-header">
                 <td>Параллель</td>
                 <td>Буквы класса</td>
                 <td class="add-class-button"></td>
             </tr>
-            <tr v-for="(parallel, parNumber) in this.$store.state.parallels" v-bind:key="parNumber">
-                <td class="parallel-number-cell">{{parNumber + 1}}</td>
+            <tr v-for="(parallel, parId) in this.$store.state.parallels" v-bind:key="parId">
+                <td class="parallel-number-cell">{{parallel.number}}</td>
                 <td class="classes-list-cell"><span v-for="(clas, classId) in parallel.classes" v-bind:key="classId">{{clas.letter}}</span></td>
                 <td class="add-class-button">
-                    <button class="settings-edit-button">
+                    <button class="settings-edit-button" @click="showEditParallelMenu(parallel.number, parId)">
                         <img class="settings-edit-icon" src="../assets/settings_edit_active.png" alt="Could not load an image">
                     </button>
                 </td>
@@ -24,23 +30,33 @@
 
 <script>
 import AddParallelMenu from './AddParallelMenu.vue';
+import EditParallelMenu from './EditParallelMenu.vue';
 
 export default {
-    beforeUpdate() {
-        console.log(this.$store.state);
-    },
     components: {
         AddParallelMenu,
+        EditParallelMenu,
+    },
+    mounted() {
+        console.log(this.$store.state);
     },
     data() {
         return {
             isAddParallelMenuShown: false,
+            isEditParallelMenuShown: false,
+            choosedParallelNumber: '',
+            choosedParallelId: '',
         }
     },
     methods: {
-        showAddParallel() {
+        showAddParallelMenu() {
             this.isAddParallelMenuShown = true;
-        }
+        },
+        showEditParallelMenu(parNumber, parId) {
+            this.isEditParallelMenuShown = true;
+            this.choosedParallelNumber = parNumber;
+            this.choosedParallelId = parId;
+        },
     }
 }
 </script>

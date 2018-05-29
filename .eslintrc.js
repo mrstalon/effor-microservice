@@ -19,11 +19,12 @@ module.exports = {
         "linebreak-style": 0,
         "arrow-body-style": ["error", "always"],
         "quote-props": ["error", "consistent"],
+        "no-else-return": ["error", { "allowElseIf": true }],
         "no-shadow": ["error", { "allow": ["state"] }],
         "no-param-reassign": [
-            "error", 
-            { 
-                "props": true, 
+            "error",
+            {
+                "props": true,
                 "ignorePropertyModificationsFor": [
                     "state",
                     "element",

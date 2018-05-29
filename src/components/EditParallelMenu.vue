@@ -3,26 +3,20 @@
         <div class="modal-mask" >
             <div class="modal-wrapper">
                 <div class="modal-container" v-on:click="preventBubling">
-                    <h1>Добавление параллели</h1>
+                    <h1>Классы {{parNumber}} параллели</h1>
                     <div class="error-message-container" v-if="errorMessage">
                         {{errorMessage}}
-                    </div>
-                    <div class="choose-parallel-number-container">
-                        <span>Введите параллель: </span>
-                        <button v-on:click="decrementParNumber">-</button>
-                        <span class="parallel-number">{{parToAddNumber}}</span>
-                        <button v-on:click="incrementParNumber">+</button>
                     </div>
                     <div class="alphabet-container">
                         <span
                         v-for="(letter, letterId) in this.$store.state.alphabet"
                         v-bind:key="letterId"
-                        @click="checkShouldWeAddOrDeleteLetter(letter.letter, letterId)"
                         v-bind:class="[letter.isClicked ? 'letter-is-choosed' : 'letter-is-not-choosed']"
+                        @click="checkShouldWeAddOrDeleteLetter(letter.letter, letterId)"
                         >{{letter.letter}}</span>
                     </div>
                     <div class="add-parallel-menu-buttons-container">
-                        <button v-on:click="validateParallelToAdd">Добавить</button>
+                        <button @click="checkShouldWeApproveChanges">Изменить</button>
                         <button @click="$emit('close')">Закрыть</button>
                     </div>
                 </div>
@@ -34,12 +28,16 @@
 
 <script>
 export default {
-    beforeUpdate() {
-        this.$store.state.arrayOfLettersToAdd;
+    props: ['parNumber', 'parId'],
+    beforeMount() {
+        this.$store.commit('lightClassesLettersInAlphabet', this.parId);
+        this.$store.commit('fillArrayOfLettersToAdd', this.parId);
+    },
+    beforeDestroy() {
+        this.$store.commit('makeStateOfAlphabetInitial');
     },
     data() {
         return {
-            parToAddNumber: 1,
             errorMessage: '',
         }
     },
@@ -47,41 +45,23 @@ export default {
         preventBubling(e) {
             e.stopPropagation();
         },
-        decrementParNumber() {
-            if (this.parToAddNumber === 1) {
-                return;
-            } else {
-                this.parToAddNumber = this.parToAddNumber - 1;
-            }
-        },
-        incrementParNumber() {
-            if (this.parToAddNumber === 11) {
-                return;
-            } else {
-                this.parToAddNumber = this.parToAddNumber + 1;
-            }
-        },
         checkShouldWeAddOrDeleteLetter(letter, letterId) {
             if (this.$store.state.arrayOfLettersToAdd.includes(letter)) {
+                console.log('includes');
                 this.$store.commit('deleteLetterFromArrayOfLetters', letter);
                 this.$store.commit('changeIsLetterClicked', letterId);
             } else {
+                console.log('not includes');
                 this.$store.commit('addLetterToArrayOfLetters', letter);
                 this.$store.commit('changeIsLetterClicked', letterId);
             }
         },
-        validateParallelToAdd() {
-            if (this.$store.state.arrayOfLettersToAdd == false) {
-                this.addErrorMessage('Нельзя создать пустую параллель');
-                return;
-            }
-            if (!this.$store.state.createdParallelsNumbers.includes(this.parToAddNumber)) {
-                this.$store.commit('addParallel', this.parToAddNumber);
-                this.$store.commit('clearArrayOfLettersToAdd');
-                this.$store.commit('makeStateOfAlphabetInitial');
+        checkShouldWeApproveChanges() {
+            if (this.$store.state.arrayOfLettersToAdd.length > 0) {
+                this.$store.commit('approveParallelChanges', {parId: this.parId, parNumber: this.parNumber});
                 this.$emit('close');
             } else {
-                this.addErrorMessage('Параллель с таким номером уже существует');
+                this.addErrorMessage('Нельзя оставить параллель пустой');
             }
         },
         addErrorMessage(errorMessage) {
@@ -127,7 +107,7 @@ export default {
     display: flex;
     flex-direction: column;
     width: 300px;
-    min-height: 350px;
+    min-height: 320px;
     height: fit-content;
     margin: 0px auto;
     padding: 0;
@@ -151,42 +131,6 @@ export default {
     margin: 20px 0;
 }
 
-.choose-parallel-number-container {
-    margin-top: 5px;
-    color: #333;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
-.choose-parallel-number-container > button {
-    text-align: center;
-    border: 0;
-    background-color: #898887;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 100%;
-    margin-top: 0px;
-    -webkit-transition: all 0.5s ease;
-    -moz-transition: all 0.5s ease;
-    -o-transition: all 0.5s ease;
-    transition: all 0.5s ease;
-    width: 30px;
-    height: 25px;
-}
-
-.choose-parallel-number-container > button:hover {
-    background-color: #ff8d00;
-}
-
-.choose-parallel-number-container > :first-child {
-    margin-left: 30px;
-}
-
-.choose-parallel-number-container > :nth-child(2) {
-    margin-left: 10px;
-}
 
 .parallel-number {
     width: 20px;
@@ -194,10 +138,6 @@ export default {
     border: 1px solid rgb(185, 185, 185);
     margin-left: 5px;
     text-align: center;
-}
-
-.choose-parallel-number-container > :last-child {
-    margin-left: 5px;
 }
 
 .alphabet-container > span {
@@ -242,6 +182,21 @@ export default {
     margin-left: 30px;
 }
 
+.error-message-container {
+    color: red;
+    margin: auto;
+    width: 230px;
+    font-size: 19px;
+}
+
+.letter-is-choosed {
+    background-color: #ff8d00 !important;
+}
+
+.letter-is-not-choosed {
+    background-color: none !important;
+}
+
 .add-parallel-menu-buttons-container > button{
     padding: 3px 15px;
     border: 0;
@@ -268,23 +223,7 @@ export default {
     margin-left: 50px;
 }
 
-.add-parallel-menu-buttons-container  > :last-child {
+.add-parallel-menu-buttons-container > :last-child {
     margin-left: 10px;
 }
-
-.error-message-container {
-    color: red;
-    margin: auto;
-    width: 230px;
-    font-size: 19px;
-}
-
-.letter-is-choosed {
-    background-color: #ff8d00 !important;
-}
-
-.letter-is-not-choosed {
-    background-color: none !important;
-}
-
 </style>

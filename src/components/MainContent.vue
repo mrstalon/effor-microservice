@@ -25,8 +25,8 @@ export default {
     },
     data() {
         return {
-            showClassesInfo: true,
-            showTeachersInfo: false,
+            showClassesInfo: false,
+            showTeachersInfo: true,
             showStudentsInfo: false,
         }
     },
