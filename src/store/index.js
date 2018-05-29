@@ -184,8 +184,9 @@ const store = {
             if (state.choosedParallel.classes[letterId].isChoosed === true) {
                 // deleting this class from tempClasses and set isChoosed of this letter to false
                 const classId = state.tempClasses.findIndex((classObj) => {
-                    return classObj.classLetter === letter;
+                    return classObj.classLetter === letter && classObj.parNumber === parId + 1;
                 });
+
                 state.tempClasses.splice(classId, 1);
                 const choosedParallel = JSON.parse(JSON.stringify(state.choosedParallel));
                 choosedParallel.classes[letterId].isChoosed = false;
@@ -210,6 +211,17 @@ const store = {
                 classes: quickTeacherClassesSort(JSON.parse(JSON.stringify(state.tempClasses))),
             };
             state.teachers.splice(tempTeacher.id, 1, newTeacher);
+        },
+        removeTeacher(state, teacherId) {
+            state.teachers.splice(teacherId, 1);
+
+            // updating teacher's id
+            state.teachers = state.teachers.map((teacher, index) => {
+                return {
+                    ...teacher,
+                    id: index,
+                };
+            });
         },
     },
     actions: {

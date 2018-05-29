@@ -1,6 +1,7 @@
 <template>
     <div class="teachers-container">
         <EditTeacherMenu v-if="isEditTeacherMenuShown" @close="isEditTeacherMenuShown = false"/>
+        <ErrorMessage v-if="errorMessage" @close="errorMessage = ''" v-bind:errorMessage="errorMessage"/>
         <table class="teachers-info-table">
             <tr class="teachers-info-table-header">
                 <td>№</td>
@@ -17,7 +18,7 @@
                     </button>
                 </td>
                 <td>
-                    <button class="settings-remove-button">
+                    <button class="settings-remove-button" @click="checkCanTeacherBeRemoved(teacherId)">
                         <img class="settings-remove-icon" src="../assets/settings_remove.png" alt="Could not load an image">
                     </button>
                 </td>
@@ -29,20 +30,33 @@
 
 <script>
 import EditTeacherMenu from './EditTeacherMenu.vue';
+import ErrorMessage from './ErrorMessage.vue';
 
 export default {
     components: {
         EditTeacherMenu,
+        ErrorMessage,
     },
     data() {
         return {
             isEditTeacherMenuShown: false,
+            errorMessage: '',
         }
     },
     methods: {
         showEditTeacherMenu(teacherId) {
             this.isEditTeacherMenuShown = true;
             this.$store.commit('changeChoosedTeacher', teacherId);
+        },
+        checkCanTeacherBeRemoved(teacherId) {
+            if (this.$store.state.teachers[teacherId].classes.length === 0) {
+                this.$store.commit('removeTeacher', teacherId);
+            } else {
+                this.showErrorMessage('Невозможно удалить учителя, так как к нему привязаны классы');
+            }
+        },
+        showErrorMessage(errorMessage) {
+            this.errorMessage = errorMessage;
         },
     }
 }
