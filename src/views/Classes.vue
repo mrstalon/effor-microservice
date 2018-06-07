@@ -1,12 +1,15 @@
 <template>
     <div class="classes-container">
         <button class="add-parallel-button" v-on:click="showAddParallelMenu">Добавить параллель</button>
-        <AddParallelMenu v-if="isAddParallelMenuShown" @close="isAddParallelMenuShown = false"/>
-        <EditParallelMenu
-        v-if="isEditParallelMenuShown"
-        @close="isEditParallelMenuShown = false"
-        v-bind:parNumber="choosedParallelNumber"
-        v-bind:parId="choosedParallelId"
+        <add-parallel-menu
+            v-if="isAddParallelMenuShown"
+            @close="isAddParallelMenuShown = false"
+        />
+        <edit-parallel-menu
+            v-if="isEditParallelMenuShown"
+            @close="isEditParallelMenuShown = false"
+            v-bind:parallelNumber="choosedParallelNumber"
+            v-bind:parallelId="choosedParallelId"
         />
         <table class="classes-info-table">
             <tr class="classes-info-table-header">
@@ -14,12 +17,29 @@
                 <td>Буквы класса</td>
                 <td class="add-class-button"></td>
             </tr>
-            <tr v-for="(parallel, parId) in this.$store.state.parallels" v-bind:key="parId">
+            <tr
+                v-for="(parallel, parallelId) in $store.state.classesModule.parallels"
+                v-bind:key="parallelId"
+            >
                 <td class="parallel-number-cell">{{parallel.number}}</td>
-                <td class="classes-list-cell"><span v-for="(clas, classId) in parallel.classes" v-bind:key="classId">{{clas.letter}}</span></td>
+                <td class="classes-list-cell">
+                    <span
+                        v-for="(clas, classId) in parallel.classes"
+                        v-bind:key="classId"
+                    >
+                        {{clas.letter}}
+                    </span>
+                </td>
                 <td class="add-class-button">
-                    <button class="settings-edit-button" @click="showEditParallelMenu(parallel.number, parId)">
-                        <img class="settings-edit-icon" src="../assets/settings_edit_active.png" alt="Could not load an image">
+                    <button
+                        class="settings-edit-button"
+                        @click="showEditParallelMenu(parallel.number, parallelId)"
+                    >
+                        <img
+                            class="settings-edit-icon"
+                            src="../assets/settings_edit_active.png"
+                            alt="Could not load an image"
+                        >
                     </button>
                 </td>
             </tr>
@@ -29,16 +49,13 @@
 
 
 <script>
-import AddParallelMenu from './AddParallelMenu.vue';
-import EditParallelMenu from './EditParallelMenu.vue';
+import AddParallelMenu from '../components/classes-components/AddParallelMenu.vue';
+import EditParallelMenu from '../components/classes-components/EditParallelMenu.vue';
 
 export default {
     components: {
         AddParallelMenu,
         EditParallelMenu,
-    },
-    mounted() {
-        console.log(this.$store.state);
     },
     data() {
         return {
@@ -52,10 +69,10 @@ export default {
         showAddParallelMenu() {
             this.isAddParallelMenuShown = true;
         },
-        showEditParallelMenu(parNumber, parId) {
+        showEditParallelMenu(parallelNumber, parallelId) {
             this.isEditParallelMenuShown = true;
-            this.choosedParallelNumber = parNumber;
-            this.choosedParallelId = parId;
+            this.choosedParallelNumber = parallelNumber;
+            this.choosedParallelId = parallelId;
         },
     }
 }
@@ -66,13 +83,13 @@ export default {
 .add-parallel-button {
     background: none;
     border: 0;
-    font-family: Philosopher, sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 16px;
     color: #898887;
     cursor: pointer;
     float: right;
-    margin-top: 2px;
-    margin-bottom: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .add-parallel-button:hover {
@@ -100,7 +117,7 @@ export default {
 }
 
 .classes-info-table-header > :first-child {
-    width: 80px;
+    width: 90px;
 }
 
 .classes-info-table > tr {
@@ -153,6 +170,26 @@ th, td {
 
 .choosed-letter {
     background-color: #ff8d00;
+}
+
+@media (max-width: 850px) {
+    .classes-container {
+        width: 600px;
+    }
+
+    .classes-info-table {
+        width: 600px;
+    }
+}
+
+@media (max-width: 650px) {
+    .classes-container {
+        width: 100%;
+    }
+
+    .classes-info-table {
+        width: 100%;
+    }
 }
 
 </style>

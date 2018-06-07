@@ -76,10 +76,30 @@ const quickTeacherClassesSort = function quickTeacherClassesSort(array) {
     return quickTeacherClassesSort(arrayOfSmaller).concat(pivot).concat(quickTeacherClassesSort(arrayOfBigger));
 };
 
+const quickSort = function quickSort(array) {
+    if (array.length <= 1) {
+        return array;
+    }
+
+    const random = Math.round(Math.random(0, array.length));
+    const pivot = array[random];
+
+    const arrayOfBigger = array.filter((item) => {
+        return item > pivot;
+    });
+
+    const arrayOfSmaller = array.filter((item) => {
+        return item < pivot;
+    });
+
+    return quickSort(arrayOfSmaller).concat(pivot).concat(quickSort(arrayOfBigger));
+};
+
 const functionsToExport = {
     quickAlphabetSort,
     quickParallelsSort,
     quickTeacherClassesSort,
+    quickSort,
 };
 
 export default functionsToExport;

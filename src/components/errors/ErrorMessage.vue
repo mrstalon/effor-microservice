@@ -30,12 +30,6 @@ export default {
 
 <style scoped>
 
-.about-info-container {
-    width: 300px;
-    font-family: Philosopher;
-    color: #222222;
-}
-
 .modal-mask {
     position: fixed;
     z-index: 9998;
@@ -64,7 +58,7 @@ export default {
     background-color: #fff;
     box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
     transition: all .3s ease;
-    font-family: Philosopher, sans-serif;
+    font-family: 'Open Sans', sans-serif;
     color: black;
 }
 
@@ -80,7 +74,7 @@ export default {
 
 .error-message-container {
     color: red;
-    font-family: Philosopher, sans-serif;
+    font-family: 'Open Sans', sans-serif;
     height: 140px;
     margin-left: 15px;
     margin-top: 20px;
@@ -104,7 +98,41 @@ export default {
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;
     transition: all 0.5s ease;
-    font-family: Philosopher, sans-serif;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.button-container > button:hover {
+    background-color: #ff8d00;
+}
+
+@media (max-width: 850px) {
+    .modal-container {
+        width: 632px;
+    }
+
+    .button-container {
+        width: 95%;
+        margin: auto;
+    }
+
+    .button-container > button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 650px) {
+    .modal-container {
+        width: 402px;
+    }
+
+    .button-container {
+        width: 95%;
+        margin: auto;
+    }
+
+    .button-container > button {
+        width: 100%;
+    }
 }
 
 </style>

@@ -8,21 +8,13 @@ const teachers = [
                 classLetter: 'А',
             },
             {
-                parNumber: 2,
-                classLetter: 'Б',
-            },
-            {
-                parNumber: 2,
-                classLetter: 'В',
-            },
-            {
                 parNumber: 3,
                 classLetter: 'А',
             },
         ],
     },
     {
-        name: 'Клец М.C',
+        name: 'Клец М.C.',
         id: 1,
         classes: [
             {
@@ -32,10 +24,6 @@ const teachers = [
             {
                 parNumber: 1,
                 classLetter: 'Б',
-            },
-            {
-                parNumber: 2,
-                classLetter: 'А',
             },
             {
                 parNumber: 3,

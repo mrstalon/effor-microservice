@@ -1,7 +1,13 @@
 <template>
     <div class="teachers-container">
-        <EditTeacherMenu v-if="isEditTeacherMenuShown" @close="isEditTeacherMenuShown = false"/>
-        <ErrorMessage v-if="errorMessage" @close="errorMessage = ''" v-bind:errorMessage="errorMessage"/>
+        <edit-teacher-menu
+            v-if="isEditTeacherMenuShown"
+            @close="isEditTeacherMenuShown = false"
+        />
+        <error-message
+            v-if="errorMessage"
+            @close="errorMessage = ''" v-bind:errorMessage="errorMessage"
+        />
         <table class="teachers-info-table">
             <tr class="teachers-info-table-header">
                 <td>№</td>
@@ -9,17 +15,34 @@
                 <td class="settings-edit-cell"></td>
                 <td class="settings-remove-cell"></td>
             </tr>
-            <tr v-for="(teacher, teacherId) in this.$store.state.teachers" v-bind:key="teacherId">
+            <tr
+                v-for="(teacher, teacherId) in $store.state.teachersModule.teachers"
+                v-bind:key="teacherId"
+            >
                 <td class="parallel-number-cell">{{teacherId + 1}}</td>
-                <td class="teachers-list-cell"><span>{{teacher.name}}</span> (<span v-for="(clas, classId) in teacher.classes" v-bind:key="classId">{{clas.parNumber}}-{{clas.classLetter}};</span>)</td>
+                <td class="teachers-list-cell">
+                    <span>{{teacher.name}}</span>
+                    (<span
+                        v-for="(clas, classId) in teacher.classes"
+                        v-bind:key="classId">{{clas.parNumber}}-{{clas.classLetter}};
+                    </span>)
+                </td>
                 <td class="add-class-button">
                     <button class="settings-edit-button" @click="showEditTeacherMenu(teacherId)">
-                        <img class="settings-edit-icon" src="../assets/settings_edit_active.png" alt="Could not load an image">
+                        <img
+                            class="settings-edit-icon"
+                            src="../assets/settings_edit_active.png"
+                            alt="Could not load an image"
+                        >
                     </button>
                 </td>
                 <td>
                     <button class="settings-remove-button" @click="checkCanTeacherBeRemoved(teacherId)">
-                        <img class="settings-remove-icon" src="../assets/settings_remove.png" alt="Could not load an image">
+                        <img
+                            class="settings-remove-icon"
+                            src="../assets/settings_remove.png"
+                            alt="Could not load an image"
+                        >
                     </button>
                 </td>
             </tr>
@@ -29,8 +52,8 @@
 
 
 <script>
-import EditTeacherMenu from './EditTeacherMenu.vue';
-import ErrorMessage from './ErrorMessage.vue';
+import EditTeacherMenu from '../components/teacher-components/EditTeacherMenu.vue';
+import ErrorMessage from '../components/errors/ErrorMessage.vue';
 
 export default {
     components: {
@@ -46,11 +69,11 @@ export default {
     methods: {
         showEditTeacherMenu(teacherId) {
             this.isEditTeacherMenuShown = true;
-            this.$store.commit('changeChoosedTeacher', teacherId);
+            this.$store.commit('CHANGE_CHOOSED_TEACHER', teacherId);
         },
         checkCanTeacherBeRemoved(teacherId) {
-            if (this.$store.state.teachers[teacherId].classes.length === 0) {
-                this.$store.commit('removeTeacher', teacherId);
+            if (this.$store.state.teachersModule.teachers[teacherId].classes.length === 0) {
+                this.$store.commit('REMOVE_TEACHER', teacherId);
             } else {
                 this.showErrorMessage('Невозможно удалить учителя, так как к нему привязаны классы');
             }
@@ -59,7 +82,7 @@ export default {
             this.errorMessage = errorMessage;
         },
     }
-}
+};
 </script>
 
 <style scoped>
@@ -67,9 +90,10 @@ export default {
 .teachers-container {
     width: 800px;
     margin: auto;
-    margin-bottom: 20px;
     margin-top: 15px;
     height: fit-content;
+    margin-top: 20px;
+    margin-bottom: 15px;
 }
 
 .teachers-info-table {
@@ -85,7 +109,8 @@ export default {
 }
 
 .teachers-info-table-header > :first-child {
-    width: 15px;
+    width: 25px;
+    text-align: center;
 }
 
 .teachers-info-table > tr {
@@ -163,6 +188,30 @@ th, td {
 
 .parallel-number-cell {
     width: 15px;
+}
+
+@media (max-width: 850px) {
+    .teachers-container {
+        width: 632px;
+        margin-bottom: 0;
+    }
+
+    .teachers-info-table {
+        width: 602px;
+        margin: 0;
+    }
+}
+
+@media (max-width: 650px) {
+    .teachers-container {
+        width: 100%;
+        margin-bottom: 0;
+    }
+
+    .teachers-info-table {
+        width: 100%;
+        margin: 0;
+    }
 }
 
 </style>

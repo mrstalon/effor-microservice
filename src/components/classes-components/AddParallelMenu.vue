@@ -3,23 +3,25 @@
         <div class="modal-mask" >
             <div class="modal-wrapper">
                 <div class="modal-container" v-on:click="preventBubling">
-                    <h1>Добавление параллели</h1>
+                    <h1><span>Добавление параллели</span></h1>
                     <div class="error-message-container" v-if="errorMessage">
                         {{errorMessage}}
                     </div>
                     <div class="choose-parallel-number-container">
                         <span>Введите параллель: </span>
                         <button v-on:click="decrementParNumber">-</button>
-                        <span class="parallel-number">{{parToAddNumber}}</span>
+                        <span class="parallel-number">{{parallelToAddNumber}}</span>
                         <button v-on:click="incrementParNumber">+</button>
                     </div>
                     <div class="alphabet-container">
                         <span
-                        v-for="(letter, letterId) in this.$store.state.alphabet"
-                        v-bind:key="letterId"
-                        @click="checkShouldWeAddOrDeleteLetter(letter.letter, letterId)"
-                        v-bind:class="[letter.isClicked ? 'letter-is-choosed' : 'letter-is-not-choosed']"
-                        >{{letter.letter}}</span>
+                            v-for="(letterObj, letterId) in $store.state.classesModule.alphabet"
+                            v-bind:key="letterId"
+                            @click="checkShouldWeAddOrDeleteLetter(letterObj.letter, letterId)"
+                            v-bind:class="[letterObj.isChoosed ? 'letter-is-choosed' : 'letter-is-not-choosed']"
+                        >
+                            {{letterObj.letter}}
+                        </span>
                     </div>
                     <div class="add-parallel-menu-buttons-container">
                         <button v-on:click="validateParallelToAdd">Добавить</button>
@@ -34,57 +36,56 @@
 
 <script>
 export default {
-    beforeUpdate() {
-        this.$store.state.arrayOfLettersToAdd;
-    },
     data() {
         return {
-            parToAddNumber: 1,
+            parallelToAddNumber: 1,
             errorMessage: '',
         }
+    },
+    beforeDestroy() {
+        this.$store.commit('MAKE_STATE_OF_ALPHABET_INITIAL');
     },
     methods: {
         preventBubling(e) {
             e.stopPropagation();
         },
         decrementParNumber() {
-            if (this.parToAddNumber === 1) {
+            if (this.parallelToAddNumber === 1) {
                 return;
             } else {
-                this.parToAddNumber = this.parToAddNumber - 1;
+                this.parallelToAddNumber = this.parallelToAddNumber - 1;
             }
         },
         incrementParNumber() {
-            if (this.parToAddNumber === 11) {
+            if (this.parallelToAddNumber === 11) {
                 return;
             } else {
-                this.parToAddNumber = this.parToAddNumber + 1;
+                this.parallelToAddNumber = this.parallelToAddNumber + 1;
             }
         },
         checkShouldWeAddOrDeleteLetter(letter, letterId) {
-            if (this.$store.state.arrayOfLettersToAdd.includes(letter)) {
-                this.$store.commit('deleteLetterFromArrayOfLetters', letter);
-                this.$store.commit('changeIsLetterClicked', letterId);
+            if (this.$store.state.classesModule.arrayOfLettersToAdd.includes(letter)) {
+                this.$store.commit('DELETE_LETTER_FROM_ARRAY_OF_LETTERS', letter);
             } else {
-                this.$store.commit('addLetterToArrayOfLetters', letter);
-                this.$store.commit('changeIsLetterClicked', letterId);
+                this.$store.commit('ADD_LETTER_TO_ARRAY_OF_LETTERS', letter);
             }
+            this.$store.commit('CHANGE_IS_LETTER_CHOOSED', letterId);
         },
         validateParallelToAdd() {
-            if (this.$store.state.arrayOfLettersToAdd == false) {
-                this.addErrorMessage('Нельзя создать пустую параллель');
+            if (this.$store.state.classesModule.arrayOfLettersToAdd == false) {
+                this.showErrorMessage('Нельзя создать пустую параллель');
                 return;
             }
-            if (!this.$store.state.createdParallelsNumbers.includes(this.parToAddNumber)) {
-                this.$store.commit('addParallel', this.parToAddNumber);
-                this.$store.commit('clearArrayOfLettersToAdd');
-                this.$store.commit('makeStateOfAlphabetInitial');
+            if (!this.$store.state.classesModule.createdParallelsNumbers.includes(this.parallelToAddNumber)) {
+                this.$store.commit('ADD_PARALLEL', this.parallelToAddNumber);
+                this.$store.commit('CLEAR_ARRAY_OF_LETTERS_TO_ADD');
+                this.$store.commit('MAKE_STATE_OF_ALPHABET_INITIAL');
                 this.$emit('close');
             } else {
-                this.addErrorMessage('Параллель с таким номером уже существует');
+                this.showErrorMessage('Параллель с таким номером уже существует');
             }
         },
-        addErrorMessage(errorMessage) {
+        showErrorMessage(errorMessage) {
             this.errorMessage = errorMessage;
 
             setTimeout(() => {
@@ -102,7 +103,7 @@ export default {
 
 .about-info-container {
     width: 300px;
-    font-family: Philosopher;
+    font-family: 'Open Sans', sans-serif;
     color: #222222;
 }
 
@@ -134,7 +135,7 @@ export default {
     background-color: #fff;
     box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
     transition: all .3s ease;
-    font-family: Philosopher, sans-serif;
+    font-family: 'Open Sans', sans-serif;
 }
 
 .modal-container > h1 {
@@ -205,16 +206,15 @@ export default {
     width: 33px;
     height: 25px;
     margin-top: 5px;
-    text-align: center;
     cursor: pointer;
     border-radius: 4px;
     text-align: center;
-    background: transparent url('../assets/zero.png') no-repeat 3px 3px;
+    background: transparent url('../../assets/zero.png') no-repeat 3px 3px;
     border: 1px solid white;
     color: black;
     margin-right: 4px;
     margin-left: 4px;
-    padding-top: 8px;
+    padding-top: 5px;
 }
 
 .alphabet-container {
@@ -251,25 +251,30 @@ export default {
     cursor: pointer;
     font-size: 100%;
     margin-top: 0px;
+    width: 160px;
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;
     transition: all 0.5s ease;
-    font-family: Philosopher, sans-serif;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.add-parallel-menu-buttons-container > button:hover {
+    background-color: #ff8d00;
 }
 
 .add-parallel-menu-buttons-container {
     margin: auto;
     margin-top: 10px;
     margin-bottom: 10px;
-}
-
-.add-parallel-menu-buttons-container > :first-child {
-    margin-left: 50px;
-}
-
-.add-parallel-menu-buttons-container  > :last-child {
-    margin-left: 10px;
+    width: 200px;
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    margin-left: 80px;
+    align-items: center;
+    margin-left: 110px;
 }
 
 .error-message-container {
@@ -287,4 +292,134 @@ export default {
     background-color: none !important;
 }
 
+@media (max-width: 850px) {
+    .modal-container {
+        width: 632px;
+        min-height: 300px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .modal-container > h1 {
+        width: 592px;
+    }
+
+    .alphabet-container {
+        width: 530px;
+    }
+
+    .alphabet-container > span {
+        margin-right: 4px !important;
+        margin-left: 4px !important;
+    }
+
+    .alphabet-container > :first-child {
+        margin-left: 4px;
+    }
+
+    .alphabet-container > :nth-child(6) {
+        margin-left: 4px;
+    }
+
+    .alphabet-container > :nth-child(11) {
+        margin-left: 4px;
+    }
+
+    .alphabet-container > :nth-child(16) {
+        margin-left: 4px;
+    }
+
+    .alphabet-container > :nth-child(21) {
+        margin-left: 4px;
+    }
+
+    .alphabet-container > :last-child {
+        margin-left: 245px !important;
+    }
+
+    .add-parallel-menu-buttons-container {
+        width: 100%;
+        margin-left: 0px;
+    }
+
+    .add-parallel-menu-buttons-container > button {
+        width: 95%;
+    }
+
+    .error-message-container {
+        width: 550px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 650px) {
+    .modal-container {
+        width: 90%;
+        max-width: 402px;
+    }
+
+    .modal-container > h1 {
+        width: 100%;
+        height: 40px;
+        padding: 0;
+        display: flex;
+        align-items: center;
+    }
+
+    .modal-container > h1 > span {
+        margin-left: 10px;
+    }
+
+    .alphabet-container {
+        width: 305px;
+    }
+
+    .alphabet-container > span {
+        margin-right: 4px !important;
+        margin-left: 4px !important;
+    }
+
+    .alphabet-container > :first-child {
+        margin-left: 4px;
+    }
+
+    .alphabet-container > :nth-child(6) {
+        margin-left: 4px;
+    }
+
+    .alphabet-container > :nth-child(11) {
+        margin-left: 4px;
+    }
+
+    .alphabet-container > :nth-child(16) {
+        margin-left: 4px;
+    }
+
+    .alphabet-container > :nth-child(21) {
+        margin-left: 4px;
+    }
+
+    .alphabet-container > :last-child {
+        margin-left: 4px !important;
+    }
+    
+    .alphabet-container > :nth-child(22) {
+        margin-left: 70px !important;
+    }
+
+    .add-parallel-menu-buttons-container {
+        width: 100%;
+        margin-left: 0px;
+    }
+
+    .add-parallel-menu-buttons-container > button {
+        width: 95%;
+    }
+
+    .error-message-container {
+        width: 550px;
+        text-align: center;
+    }
+}
 </style>

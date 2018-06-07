@@ -1,5 +1,6 @@
 body {
     margin: 0;
+    min-width: 300px;
 }
 
 @font-face {
@@ -9,4 +10,10 @@ body {
 
 button:focus {
     outline:0;
+}
+
+@media (max-width: 418px) {
+    * {
+        font-size: 14px !important;
+    }
 }
