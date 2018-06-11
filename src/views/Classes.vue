@@ -36,6 +36,7 @@
                         @click="showEditParallelMenu(parallel.number, parallelId)"
                     >
                         <img
+                            title="Редактировать буквы классов"
                             class="settings-edit-icon"
                             src="../assets/settings_edit_active.png"
                             alt="Could not load an image"

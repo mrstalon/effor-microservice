@@ -30,6 +30,7 @@
                 <td class="add-class-button">
                     <button class="settings-edit-button" @click="showEditTeacherMenu(teacherId)">
                         <img
+                            title="Редактировать классы учителя"
                             class="settings-edit-icon"
                             src="../assets/settings_edit_active.png"
                             alt="Could not load an image"
@@ -39,6 +40,7 @@
                 <td>
                     <button class="settings-remove-button" @click="checkCanTeacherBeRemoved(teacherId)">
                         <img
+                            title="Удалить учителя из школы"
                             class="settings-remove-icon"
                             src="../assets/settings_remove.png"
                             alt="Could not load an image"

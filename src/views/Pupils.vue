@@ -32,29 +32,29 @@
             >
                 <div class="class-header">
                     <h1>{{$store.state.pupilsModule.choosedParallelNumber}}-{{classObj.letter}}</h1>
-                    <div class="edit-buttons-container" v-if="!isStudentListEmpty(classObj.letter)">
-                        <button class="add-pupils-alone-button" @click="showAddPupilMenu()">
+                    <div class="edit-buttons-container" v-if="!isStudentListEmpty(classObj.letter)" >
+                        <button class="add-pupils-alone-button" @click="showAddPupilMenu()" title="Добавить учеников по логину">
                             <img src="../assets/add-pupils-icon.png">
                             <span>Добавить</span>
                         </button>
                     </div>
                     <div class="edit-buttons-container" v-if="isStudentListEmpty(classObj.letter)">
-                        <button class="about-pupils-button" @click="showClassReportsMenu(classObj.letter)">
+                        <button class="about-pupils-button" @click="showClassReportsMenu(classObj.letter)" title="Отчёты по проверочным работам">
                             <img src="../assets/pupils-info-icon.png" class="pupils-info-img">
                             <span>Отчёты</span>
                         </button>
 
-                        <button class="add-pupils-button" @click="showAddPupilMenu()">
+                        <button class="add-pupils-button" @click="showAddPupilMenu()" title="Добавить учеников по логину">
                             <img src="../assets/add-pupils-icon.png">
                             <span>Добавить</span>
                         </button>
 
-                        <button class="print-pupils-button">
+                        <button class="print-pupils-button" title="Распечатать информацию о классе">
                             <img src="../assets/print-pupils-icon.png">
                             <span>Печать</span>
                         </button>
 
-                        <button class="remove-pupils-button" @click="showDeletePupilsMenu(classObj.letter)">
+                        <button class="remove-pupils-button" @click="showDeletePupilsMenu(classObj.letter)" title="Удалить учеников из школы">
                             <img src="../assets/remove-pupils-icon.png">
                             <span>Удалить</span>
                         </button>
