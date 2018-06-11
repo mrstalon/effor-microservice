@@ -1,6 +1,6 @@
 <template>
     <div class="container" v-on:click="hideShowedComponents">
-        <About v-if="showAboutMenu" @close="showAboutMenu = false"/>
+        <About v-if="showAboutMenu" @close="showAboutMenu = false" />
         <header>
             <a href="https://new.effor.by/home">
                 <img src="./assets/header_logo.png" alt="Could not load an image" class="header-logo-img">

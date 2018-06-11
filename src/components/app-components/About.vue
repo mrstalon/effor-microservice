@@ -1,6 +1,6 @@
 <template>
     <transition name="modal" >
-        <div class="modal-mask" >
+        <div class="modal-mask">
             <div class="modal-wrapper">
                 <div class="modal-container" v-on:click="preventBubling">
                     <div class="header-container">
@@ -25,6 +25,9 @@
                     <capabilities
                         v-if="capabilitiesComponentShown"
                     />
+                    <about-platform
+                        v-if="aboutComponentShown"
+                    />
                 </div>
             </div>
         </div>
@@ -34,10 +37,12 @@
 
 <script>
 import Capabilities from './about/Capabilities.vue';
+import AboutPlatform from './about/AboutPlatform.vue';
 
 export default {
     components: {
         Capabilities,
+        AboutPlatform,
     },
     data() {
         return {
@@ -104,10 +109,11 @@ export default {
 }
 
 .close-button {
+    font-family: 'Open Sans', sans-serif;
     height: 44px;
     width: 36px;
     cursor: pointer;
-    font-size: 300%;
+    font-size: 250%;
     font-weight: bold;
     color: #ff8d00;
     background: 0;

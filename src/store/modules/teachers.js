@@ -89,6 +89,9 @@ const mutations = {
 
         newTempTeacher.tempParallels[parallelId].isChoosed = !state.tempTeacher.tempParallels[parallelId].isChoosed;
         state.tempTeacher = newTempTeacher;
+        if (state.choosedParallel !== null) {
+            state.tempTeacher.tempParallels[state.choosedParallel.id].classes = state.choosedParallel.classes;
+        }
         state.choosedParallel = state.tempTeacher.tempParallels[parallelId];
     },
     [CHOOSE_LETTER](state, payload) {
@@ -97,10 +100,15 @@ const mutations = {
             return item.letter === letter;
         });
 
+        const parallelNumber = state.parallels.find((parallel) => {
+            return parallel.id === parallelId;
+        }).number;
+
         if (state.choosedParallel.classes[letterId].isChoosed === true) {
             // deleting this class from tempClasses and set isChoosed of this letter to false
+
             const classId = state.tempClasses.findIndex((classObj) => {
-                return classObj.classLetter === letter && classObj.parNumber === parallelId + 1;
+                return classObj.classLetter === letter && classObj.parNumber === parallelNumber;
             });
 
             state.tempClasses.splice(classId, 1);
@@ -109,9 +117,7 @@ const mutations = {
             state.choosedParallel = choosedParallel;
         } else {
             // adding this class to tempClasses and set isChoosed of this letter to true
-            const parallelNumber = state.parallels.find((parallel) => {
-                return parallel.id === parallelId;
-            }).number;
+
             state.tempClasses.push({
                 parNumber: parallelNumber,
                 classLetter: letter,

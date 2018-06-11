@@ -1,4 +1,4 @@
-import removeElementFromArray from '../../helpers/removeElementFromArray';
+import removeElementFromArray from '../../helpers/remove-element-from-array';
 import sortFunctions from '../../helpers/quick-sorts';
 
 import teachers from '../../response-mocks/teachers';

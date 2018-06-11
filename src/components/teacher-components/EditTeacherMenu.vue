@@ -54,7 +54,6 @@ export default {
             e.stopPropagation();
         },
         chooseParallel(parallelId) {
-            console.log(parallelId);
             this.$store.commit('CHOOSE_PARALLEL', parallelId);
             this.isParallelChoosed = true;
             this.choosedParallelId = parallelId;
