@@ -30,7 +30,16 @@
 
 <script>
 export default {
-    props: ['parallelNumber', 'parallelId'],
+    props: {
+        parallelNumber: {
+            type: Number,
+            required: true,
+        },
+        parallelId: {
+            type: Number,
+            required: true,
+        },
+    },
     beforeMount() {
         this.$store.commit('LIGHT_CHOOSED_CLASSES_LETTERS_IN_ALPHABET', this.parallelId);
         this.$store.commit('FILL_ARRAY_OF_LETTERS_TO_ADD', this.parallelId);
@@ -232,7 +241,7 @@ export default {
     margin-left: 110px;
 }
 
-@media (max-width: 850px) {
+@media screen and (max-width: 850px) {
     .modal-container {
         width: 632px;
         min-height: 250px;
@@ -293,7 +302,7 @@ export default {
     }
 }
 
-@media (max-width: 650px) {
+@media screen and (max-width: 650px) {
     .modal-container {
         width: 90%;
         max-width: 402px;

@@ -104,15 +104,15 @@ export default {
     margin-left: 8px;
 }
 
-.nav-container-desktop > a:hover {
+/* .nav-container-desktop > a:hover {
     color: #ff8d00;
-}
+} */
 
-.nav-container-desktop > a > div:hover {
+.nav-container-desktop > a:hover div {
     background-color: #ff8d00;
 }
 
-.nav-container-desktop > a > span:hover {
+.nav-container-desktop > a:hover span {
     color: #ff8d00;
 }
 

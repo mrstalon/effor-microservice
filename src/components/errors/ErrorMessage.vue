@@ -19,7 +19,12 @@
 
 <script>
 export default {
-    props: ['errorMessage'],
+    props: {
+        errorMessage: {
+            type: String,
+            required: true,
+        },
+    },
     methods: {
         preventBubling(e) {
             e.stopPropagation();

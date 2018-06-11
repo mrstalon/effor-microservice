@@ -1,6 +1,6 @@
 <template>
     <div class="container" v-on:click="hideShowedComponents">
-        <About v-if="showModal" @close="showModal = false"/>
+        <About v-if="showAboutMenu" @close="showAboutMenu = false"/>
         <header>
             <a href="https://new.effor.by/home">
                 <img src="./assets/header_logo.png" alt="Could not load an image" class="header-logo-img">
@@ -16,7 +16,7 @@
                     <span></span>
                 </div>
                 <nav-desktop-menu v-if="showNavDesktop" class="nav-component-desktop"/>
-                <nav-mobile-menu v-if="showNavMobile" class="nav-component-mobile"/>
+                <nav-mobile-menu v-if="showNavMobile" class="nav-component-mobile" @showNav="showAboutMenu = true" @close="showNavMobile = false"/>
             </div>
         </header>
 
@@ -64,15 +64,18 @@ export default {
     },
     data() {
         return {
-            showModal: false,
+            showAboutMenu: false,
             showNavDesktop: false,
             showNavMobile: false,
         }
     },
     methods: {
         showAboutInfo(e) {
-            this.showModal = true;
+            this.showAboutMenu = true;
             e.stopPropagation();
+        },
+        showAboutMenuFunc() {
+            this.showAboutMenu = true;
         },
         showNavComponent(e) {
             this.showNavDesktop = !this.showNavDesktop;
@@ -90,7 +93,7 @@ export default {
         hideShowedComponents() {
             this.showNavDesktop = false;
             this.showNavMobile = false;
-            this.showModal = false;
+            this.showAboutMenu = false;
         }
     }
 }
@@ -100,7 +103,8 @@ export default {
 
 .container {
     height: 100%;
-    display: flex;
+    width: 100%;
+    display: table;
     flex-direction: column;
     font-family: 'Open Sans', sans-serif;
     color: #898887;
@@ -113,7 +117,7 @@ header, main, footer {
 
 header {
     flex-direction: row;
-    height: 73px;
+    height: 75px;
     border-bottom: 1px solid #89888752;
     justify-content: space-between;
     align-items: center;
@@ -192,14 +196,13 @@ header > a {
 
 
 main {
-    min-height: 690px;
-    height: fit-content;
     background: url('./assets/main_background.jpg');
+    height: 100%;
+    display: table-row;
 }
 
 footer {
     border-top: 1px solid #89888752;
-    height: 35px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -289,7 +292,7 @@ a.router-link-exact-active {
     display: none;
 }
 
-@media (max-width: 850px) {
+@media screen and (max-width: 850px) {
     .main-content-container {
         width: 602px;
         padding: 15px;
@@ -300,13 +303,9 @@ a.router-link-exact-active {
         margin-top: 0;
     }
 
-    main {
-        min-height: 590px;
-    }
-
 }
 
-@media (max-width: 650px) {
+@media screen and (max-width: 650px) {
     .user-info-button {
         display: none;
     }
@@ -368,7 +367,7 @@ a.router-link-exact-active {
     }
 
     main {
-        min-height: 615px;
+        min-height: 720px;
     }
 
     .about-button {

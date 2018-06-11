@@ -166,6 +166,7 @@ export default {
     cursor: pointer;
     border: 0;
     font-size: 16px;
+    background-color: white;
 }
 
 .buttons-container > :last-child {
@@ -175,6 +176,7 @@ export default {
     cursor: pointer;
     border: 0;
     font-size: 16px;
+    background-color: white;
 }
 
 .class-header {

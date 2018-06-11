@@ -24,7 +24,12 @@
 
 <script>
 export default {
-    props: ['choosedParallelId'],
+    props: {
+        chooseParallelId: {
+            type: Number,
+            required: true,
+        }
+    },
     methods: {
         preventBubling(e) {
             e.stopPropagation();

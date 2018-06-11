@@ -75,7 +75,8 @@ const parallels = [
             },
             {
                 letter: 'В',
-                pupils: [],
+                pupils: [
+                ],
             },
             {
                 letter: 'Г',

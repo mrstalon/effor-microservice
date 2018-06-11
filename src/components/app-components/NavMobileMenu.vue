@@ -1,7 +1,7 @@
 <template>
     <div class="nav-container-mobile">
         <h1>{{$store.state.appModule.userName}}</h1>
-                <a href="">
+        <a href="">
             <div>
                 <img src="../../assets/profile-icon-white.png" alt="Could not load an image">
             </div>
@@ -43,7 +43,7 @@
             </div>
             <span>Турниры</span>
         </a>
-        <a href="">
+        <a @click="showNavMenu">
             <i>i</i>
             <span>О платформе</span>
         </a>
@@ -58,9 +58,19 @@
 
 
 <script>
-export default {
-    methods: {
 
+export default {
+    data() {
+        return {
+
+        };
+    },
+    methods: {
+        showNavMenu(e) {
+            this.$emit('showNav');
+            e.stopPropagation();
+            this.$emit('close');
+        }
     }
 }
 </script>
