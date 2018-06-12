@@ -2,16 +2,16 @@
     <transition name="modal" >
         <div class="modal-mask" >
             <div class="modal-wrapper">
-                <div class="modal-container" v-on:click="preventBubling">
+                <div class="modal-container" @click="preventBubling">
                     <h1><span>Классы: {{$store.state.teachersModule.tempTeacher.name}}</span></h1>
                     <div>Выберите параллель:</div>
                     <div class="parallel-list-container">
                         <span
                             class="parallel-number"
                             v-for="(parallel, parallelId) in $store.state.teachersModule.tempTeacher.tempParallels"
-                            v-bind:key="parallelId"
+                            :key="parallelId"
                             @click="chooseParallel(parallel.id)"
-                            v-bind:class="[parallel.isTeached ? 'parallel-is-teached' : 'parallel-is-not-teached', parallel.isChoosed ? 'parallel-is-choosed' : 'parallel-is-not-choosed']"
+                            :class="[parallel.isTeached ? 'parallel-is-teached' : 'parallel-is-not-teached', parallel.isChoosed ? 'parallel-is-choosed' : 'parallel-is-not-choosed']"
                         >
                             {{parallel.number}}
                         </span>
@@ -19,8 +19,8 @@
                             <div>Выберите классы:</div>
                             <span
                                 v-for="(classObj, classId) in $store.state.teachersModule.choosedParallel.classes"
-                                v-bind:key="classId"
-                                v-bind:class="[classObj.isChoosed ? 'class-is-choosed' : 'class-is-not-choosed']"
+                                :key="classId"
+                                :class="[classObj.isChoosed ? 'class-is-choosed' : 'class-is-not-choosed']"
                                 @click="chooseLetter(classObj.letter)"
                             >
                                 {{ classObj.letter }}

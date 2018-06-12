@@ -2,7 +2,7 @@
     <transition name="modal" >
         <div class="modal-mask" >
             <div class="modal-wrapper">
-                <div v-on:click="preventBubling">
+                <div @click="preventBubling">
                     <div class="modal-container" v-if="!errorMessage">
                         <h1><span>Добавление новых учеников</span></h1>
                         <div class="choose-checkboxes-container">
@@ -10,7 +10,7 @@
                             <select v-model="choosedParallelNumber">
                                 <option
                                     v-for="(parallelNumber, parId) in $store.state.classesModule.createdParallelsNumbers"
-                                    v-bind:key="parId"
+                                    :key="parId"
                                 >
                                     {{parallelNumber}}
                                 </option>
@@ -18,7 +18,7 @@
                             <select v-model="choosedClassLetter">
                                 <option
                                     v-for="(classObj, classId) in $store.state.pupilsModule.parallels[choosedParallelNumber - 1].classes"
-                                    v-bind:key="classId"
+                                    :key="classId"
                                 >
                                     {{classObj.letter}}
                                 </option>

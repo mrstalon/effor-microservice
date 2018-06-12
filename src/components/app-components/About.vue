@@ -2,18 +2,18 @@
     <transition name="modal" >
         <div class="modal-mask">
             <div class="modal-wrapper">
-                <div class="modal-container" v-on:click="preventBubling">
+                <div class="modal-container" @click="preventBubling">
                     <div class="header-container">
                         <div class="buttons-container">
                             <button
-                                v-bind:class="[capabilitiesComponentShown ? 'button-is-choosed' : 'button-is-not-choosed']"
+                                :class="[capabilitiesComponentShown ? 'button-is-choosed' : 'button-is-not-choosed']"
                                 @click="showCapabilitiesComponent()"
                             >
                                 Возможности
                             </button>
                             <button
                                 @click="showAboutComponent()"
-                                v-bind:class="[aboutComponentShown ? 'button-is-choosed' : 'button-is-not-choosed']"
+                                :class="[aboutComponentShown ? 'button-is-choosed' : 'button-is-not-choosed']"
                             >
                                 О платформе
                             </button>

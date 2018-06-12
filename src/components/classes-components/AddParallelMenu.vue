@@ -2,29 +2,29 @@
     <transition name="modal" >
         <div class="modal-mask" >
             <div class="modal-wrapper">
-                <div class="modal-container" v-on:click="preventBubling">
+                <div class="modal-container" @click="preventBubling">
                     <h1><span>Добавление параллели</span></h1>
                     <div class="error-message-container" v-if="errorMessage">
                         {{errorMessage}}
                     </div>
                     <div class="choose-parallel-number-container">
                         <span>Введите параллель: </span>
-                        <button v-on:click="decrementParNumber">-</button>
+                        <button @click="decrementParNumber">-</button>
                         <span class="parallel-number">{{parallelToAddNumber}}</span>
-                        <button v-on:click="incrementParNumber">+</button>
+                        <button @click="incrementParNumber">+</button>
                     </div>
                     <div class="alphabet-container">
                         <span
                             v-for="(letterObj, letterId) in $store.state.classesModule.alphabet"
-                            v-bind:key="letterId"
+                            :key="letterId"
                             @click="checkShouldWeAddOrDeleteLetter(letterObj.letter, letterId)"
-                            v-bind:class="[letterObj.isChoosed ? 'letter-is-choosed' : 'letter-is-not-choosed']"
+                            :class="[letterObj.isChoosed ? 'letter-is-choosed' : 'letter-is-not-choosed']"
                         >
                             {{letterObj.letter}}
                         </span>
                     </div>
                     <div class="add-parallel-menu-buttons-container">
-                        <button v-on:click="validateParallelToAdd">Добавить</button>
+                        <button @click="validateParallelToAdd">Добавить</button>
                         <button @click="$emit('close')">Закрыть</button>
                     </div>
                 </div>

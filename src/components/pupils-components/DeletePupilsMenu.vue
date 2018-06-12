@@ -2,13 +2,13 @@
     <transition name="modal" >
         <div class="modal-mask" >
             <div class="modal-wrapper">
-                <div class="modal-container" v-on:click="preventBubling">
+                <div class="modal-container" @click="preventBubling">
                     <h1><span>Добавление ученика</span></h1>
                     <div class="pupils-list">
                         <div
                             v-for="(pupil, pupilId) in $store.state.pupilsModule.choosedClassPupilList"
                             class="pupil-div"
-                            v-bind:key="pupilId"
+                            :key="pupilId"
                             @click="choosePupil(pupil.login)"
                         >
                             <img

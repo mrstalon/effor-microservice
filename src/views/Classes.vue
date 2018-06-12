@@ -1,6 +1,6 @@
 <template>
     <div class="classes-container">
-        <button class="add-parallel-button" v-on:click="showAddParallelMenu">Добавить параллель</button>
+        <button class="add-parallel-button" @click="showAddParallelMenu">Добавить параллель</button>
         <add-parallel-menu
             v-if="isAddParallelMenuShown"
             @close="isAddParallelMenuShown = false"
@@ -8,8 +8,8 @@
         <edit-parallel-menu
             v-if="isEditParallelMenuShown"
             @close="isEditParallelMenuShown = false"
-            v-bind:parallelNumber="choosedParallelNumber"
-            v-bind:parallelId="choosedParallelId"
+            :parallelNumber="choosedParallelNumber"
+            :parallelId="choosedParallelId"
         />
         <table class="classes-info-table">
             <tr class="classes-info-table-header">
@@ -19,13 +19,13 @@
             </tr>
             <tr
                 v-for="(parallel, parallelId) in $store.state.classesModule.parallels"
-                v-bind:key="parallelId"
+                :key="parallelId"
             >
                 <td class="parallel-number-cell">{{parallel.number}}</td>
                 <td class="classes-list-cell">
                     <span
                         v-for="(clas, classId) in parallel.classes"
-                        v-bind:key="classId"
+                        :key="classId"
                     >
                         {{clas.letter}}
                     </span>

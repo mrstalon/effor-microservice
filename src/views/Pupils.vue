@@ -7,7 +7,7 @@
         <choose-parallel
             v-if="isChooseParallelShown"
             @close="isChooseParallelShown = false"
-            v-bind:choosedParallelId="$store.state.pupilsModule.choosedParallelId"
+            :choosedParallelId="$store.state.pupilsModule.choosedParallelId"
         />
         <class-reports-menu
             v-if="isReportsMenuShown"
@@ -28,7 +28,7 @@
         <div class="class-list-container">
             <div
                 v-for="(classObj, classId) in $store.state.pupilsModule.parallels[$store.state.pupilsModule.choosedParallelId].classes"
-                v-bind:key="classId"
+                :key="classId"
             >
                 <div class="class-header">
                     <h1>{{$store.state.pupilsModule.choosedParallelNumber}}-{{classObj.letter}}</h1>
@@ -63,7 +63,7 @@
                 <div class="pupils-list-container">
                     <div
                         v-for="(pupil, pupilId) in classObj.pupils"
-                        v-bind:key="pupilId"
+                        :key="pupilId"
                     >
                         <span>
                             {{pupil.login}}

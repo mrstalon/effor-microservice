@@ -2,7 +2,7 @@
     <transition name="modal" >
         <div class="modal-mask" >
             <div class="modal-wrapper">
-                <div class="modal-container" v-on:click="preventBubling">
+                <div class="modal-container" @click="preventBubling">
                     <h1>Ошибка!</h1>
                     <div class="error-message-container">
                         {{errorMessage}}

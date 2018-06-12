@@ -2,7 +2,7 @@
     <transition name="modal" >
         <div class="modal-mask" >
             <div class="modal-wrapper">
-                <div class="modal-container" v-on:click="preventBubling">
+                <div class="modal-container" @click="preventBubling">
                     <h1>Проверочные работы: ученика {{$store.state.pupilsModule.choosedParallelNumber}}-{{$store.state.pupilsModule.choosedClassLetter}} класса</h1>
                     <div class="reports-container">
 

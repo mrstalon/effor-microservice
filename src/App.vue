@@ -6,7 +6,7 @@
                 <img src="./assets/header_logo.png" alt="Could not load an image" class="header-logo-img">
             </a>
             <div class="user-profile-container">
-                <button class="user-info-button" v-on:click="showNavComponent">
+                <button class="user-info-button" @click="showNavComponent">
                   <img src="./assets/avatar_default.png" alt="Could not load an image" class="avatar-logo-img">
                   <p>{{$store.state.appModule.userName}}</p>
                 </button>
@@ -38,7 +38,7 @@
                 </p>
             </div>
 
-            <button class="about-button" v-on:click="showAboutInfo">
+            <button class="about-button" @click="showAboutInfo">
                 <p>
                     О платформе
                 </p>

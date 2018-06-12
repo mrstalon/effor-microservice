@@ -7,8 +7,8 @@
                     <div class="parallel-list-container">
                         <span
                             v-for="(parallel, parallelId) in $store.state.pupilsModule.parallels"
-                            v-bind:key="parallelId"
-                            v-bind:class="[parallel.id === choosedParallelId ? 'parallel-is-choosed' : 'parallel-is-not-choosed']"
+                            :key="parallelId"
+                            :class="[parallel.id === choosedParallelId ? 'parallel-is-choosed' : 'parallel-is-not-choosed']"
                             @click="chooseParallel(parallel.id, parallel.number)"
                          >
                             {{parallel.number}}

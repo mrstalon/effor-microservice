@@ -6,7 +6,7 @@
         />
         <error-message
             v-if="errorMessage"
-            @close="errorMessage = ''" v-bind:errorMessage="errorMessage"
+            @close="errorMessage = ''" :errorMessage="errorMessage"
         />
         <table class="teachers-info-table">
             <tr class="teachers-info-table-header">
@@ -17,14 +17,14 @@
             </tr>
             <tr
                 v-for="(teacher, teacherId) in $store.state.teachersModule.teachers"
-                v-bind:key="teacherId"
+                :key="teacherId"
             >
                 <td class="parallel-number-cell">{{teacherId + 1}}</td>
                 <td class="teachers-list-cell">
                     <span>{{teacher.name}}</span>
                     (<span
                         v-for="(clas, classId) in teacher.classes"
-                        v-bind:key="classId">{{clas.parNumber}}-{{clas.classLetter}};
+                        :key="classId">{{clas.parNumber}}-{{clas.classLetter}};
                     </span>)
                 </td>
                 <td class="add-class-button">

@@ -2,7 +2,7 @@
     <transition name="modal" >
         <div class="modal-mask" >
             <div class="modal-wrapper">
-                <div class="modal-container" v-on:click="preventBubling">
+                <div class="modal-container" @click="preventBubling">
                     <h1><span>Классы {{parallelNumber}} параллели</span></h1>
                     <div class="error-message-container" v-if="errorMessage">
                         {{errorMessage}}
@@ -10,8 +10,8 @@
                     <div class="alphabet-container">
                         <span
                             v-for="(letterObj, letterId) in $store.state.classesModule.alphabet"
-                            v-bind:key="letterId"
-                            v-bind:class="[letterObj.isChoosed ? 'letter-is-choosed' : 'letter-is-not-choosed']"
+                            :key="letterId"
+                            :class="[letterObj.isChoosed ? 'letter-is-choosed' : 'letter-is-not-choosed']"
                             @click="checkShouldWeAddOrDeleteLetter(letterObj.letter, letterId)"
                         >
                             {{letterObj.letter}}
