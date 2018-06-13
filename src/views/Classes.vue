@@ -53,10 +53,23 @@
 import AddParallelMenu from '../components/classes-components/AddParallelMenu.vue';
 import EditParallelMenu from '../components/classes-components/EditParallelMenu.vue';
 
+import axios from 'axios';
+import { error } from 'util';
+
 export default {
     components: {
         AddParallelMenu,
         EditParallelMenu,
+    },
+    beforeMount() {
+        axios
+            .get('http://192.168.0.104:8090/teacher/getparallels/t1', { withCredentials: true })
+            .then((response) => {
+                console.log(response);
+            })
+            .catch(error => {
+                console.log(error);
+            });
     },
     data() {
         return {

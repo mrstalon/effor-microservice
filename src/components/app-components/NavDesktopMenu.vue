@@ -1,6 +1,6 @@
 <template>
     <div class="nav-container-desktop" @click="preventBubling">
-        <a href="">
+        <a href="http://192.168.0.104:8090/teacher">
             <div>
                 <img src="../../assets/profile-icon.png" alt="Could not load an image">
             </div>

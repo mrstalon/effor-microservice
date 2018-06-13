@@ -53,6 +53,8 @@ import About from './components/app-components/About.vue';
 import NavDesktopMenu from './components/app-components/NavDesktopMenu.vue';
 import NavMobileMenu from './components/app-components/NavMobileMenu.vue';
 
+import axios from 'axios';
+
 export default {
     beforeMount() {
         this.$store.commit('INITIALIZE_CREATED_PARALLELS_NUMBERS');

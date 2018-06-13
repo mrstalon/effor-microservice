@@ -60,6 +60,9 @@ module.exports = {
         disableHostCheck: true,
         host: '192.168.0.105',
         port: 8080,
+        headers: {
+            'Access-Control-Allow-Origin': 'http://192.168.0.105:8080',
+        },
     },
     performance: {
         hints: false,
