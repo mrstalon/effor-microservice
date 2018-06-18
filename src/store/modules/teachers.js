@@ -1,5 +1,4 @@
-import parallelsList from '../../response-mocks/parallels';
-import teachersList from '../../response-mocks/teachers';
+import HTTP from '../../http-config';
 
 
 import sortFunctions from '../../helpers/quick-sorts';
@@ -7,6 +6,8 @@ import sortFunctions from '../../helpers/quick-sorts';
 const { quickTeacherClassesSort } = sortFunctions;
 
 
+const SET_PARALLELS_LIST = 'SET_PARALLELS_LIST';
+const SET_TEACHERS_LIST = 'SET_TEACHERS_LIST';
 const CHANGE_CHOOSED_TEACHER = 'CHANGE_CHOOSED_TEACHER';
 const CLEAR_TEMP_VARIABLES = 'CLEAR_TEMP_VARIABLES';
 const CHOOSE_PARALLEL = 'CHOOSE_PARALLEL';
@@ -16,14 +17,20 @@ const REMOVE_TEACHER = 'REMOVE_TEACHER';
 
 
 const state = {
-    parallels: parallelsList,
-    teachers: teachersList,
+    parallels: [],
+    teachers: [],
     choosedParallel: null,
     tempTeacher: null,
     tempClasses: null,
 };
 
 const mutations = {
+    [SET_PARALLELS_LIST](state, newParallelsList) {
+        state.parallels = newParallelsList;
+    },
+    [SET_TEACHERS_LIST](state, newTeachersList) {
+        state.teachers = newTeachersList;
+    },
     [CHANGE_CHOOSED_TEACHER](state, newTeacherId) {
         // changing choosed teacher + lighting parallels and classes teached by this teacher
         const newChoosedTeacher = JSON.parse(JSON.stringify(state.teachers[newTeacherId]));
@@ -127,30 +134,71 @@ const mutations = {
             state.choosedParallel = choosedParallel;
         }
     },
-    [APPROVE_TEACHER_CHANGES](state) {
+    [APPROVE_TEACHER_CHANGES](state, newTeacherList) {
         // approving changes of teacher data
+        state.teachers = newTeacherList;
+    },
+    [REMOVE_TEACHER](state, newTeachersList) {
+        state.teachers = newTeachersList;
+    },
+};
+
+const actions = {
+    getTeachersList({ commit }) {
+        HTTP.get('getteachers')
+            .then((response) => {
+                console.log(response.data);
+                commit('SET_TEACHERS_LIST', response.data.teachers);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    },
+    approveTeacherChanges({ commit, state }) {
         const tempTeacher = JSON.parse(JSON.stringify(state.tempTeacher));
+        const newTeachersList = JSON.parse(JSON.stringify(state.teachers));
         const newTeacher = {
-            name: tempTeacher.name,
-            id: tempTeacher.id,
+            ...tempTeacher,
             classes: quickTeacherClassesSort(JSON.parse(JSON.stringify(state.tempClasses))),
         };
-        state.teachers.splice(tempTeacher.id, 1, newTeacher);
-    },
-    [REMOVE_TEACHER](state, teacherId) {
-        state.teachers.splice(teacherId, 1);
+        newTeachersList.splice(tempTeacher.id, 1, newTeacher);
 
+        HTTP.put('approveteacherchanges', {
+            teacher: newTeacher,
+        })
+            .then(() => {
+                commit('APPROVE_TEACHER_CHANGES', newTeachersList);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    },
+    removeTeacher({ commit, state }, teacherId) {
+        let newTeachersList = JSON.parse(JSON.stringify(state.teachers));
+
+        newTeachersList.splice(teacherId, 1);
         // updating teacher's id
-        state.teachers = state.teachers.map((teacher, index) => {
+        newTeachersList = newTeachersList.map((teacher, index) => {
             return {
                 ...teacher,
                 id: index,
             };
         });
+
+        HTTP.post('removeteacher', {
+            teachers: newTeachersList,
+        })
+            .then(() => {
+                commit('REMOVE_TEACHER', newTeachersList);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     },
 };
 
 export default {
     state,
     mutations,
+    actions,
 };

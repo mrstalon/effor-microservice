@@ -91,6 +91,9 @@ export default {
         AddPupilMenu,
         DeletePupilsMenu,
     },
+    beforeMount() {
+        this.$store.dispatch('getParallelsList');
+    },
     data() {
         return {
             isChooseParallelShown: false,

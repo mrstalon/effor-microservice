@@ -67,7 +67,7 @@ export default {
         },
         checkShouldWeApproveChanges() {
             if (this.$store.state.classesModule.arrayOfLettersToAdd.length > 0) {
-                this.$store.commit('APPROVE_PARALLEL_CHANGES', {parallelId: this.parallelId, parallelNumber: this.parallelNumber});
+                this.$store.dispatch('approveParallelChanges', {parallelId: this.parallelId, parallelNumber: this.parallelNumber});
                 this.$emit('close');
             } else {
                 this.addErrorMessage('Нельзя оставить параллель пустой');

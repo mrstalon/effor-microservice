@@ -21,7 +21,7 @@
             >
                 <td class="parallel-number-cell">{{teacherId + 1}}</td>
                 <td class="teachers-list-cell">
-                    <span>{{teacher.name}}</span>
+                    <span>{{teacher.firstName}} {{teacher.lastName}}</span>
                     (<span
                         v-for="(clas, classId) in teacher.classes"
                         :key="classId">{{clas.parNumber}}-{{clas.classLetter}};
@@ -62,6 +62,10 @@ export default {
         EditTeacherMenu,
         ErrorMessage,
     },
+    beforeMount() {
+        this.$store.dispatch('getTeachersList');
+        this.$store.dispatch('getParallelsList');
+    },
     data() {
         return {
             isEditTeacherMenuShown: false,
@@ -75,7 +79,7 @@ export default {
         },
         checkCanTeacherBeRemoved(teacherId) {
             if (this.$store.state.teachersModule.teachers[teacherId].classes.length === 0) {
-                this.$store.commit('REMOVE_TEACHER', teacherId);
+                this.$store.dispatch('removeTeacher', teacherId);
             } else {
                 this.showErrorMessage('Невозможно удалить учителя, так как к нему привязаны классы');
             }

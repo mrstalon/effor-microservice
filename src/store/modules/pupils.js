@@ -1,6 +1,10 @@
+import HTTP from '../../http-config';
+
+
 import parallels from '../../response-mocks/parallels';
 
 
+const SET_PARALLELS_LIST = 'SET_PARALLELS_LIST';
 const CHOOSE_PARALLEL_TO_RENDER = 'CHOOSE_PARALLEL_TO_RENDER';
 const CHANGE_CHOOSED_CLASS = 'CHANGE_CHOOSED_CLASS';
 const CHOOSE_PUPIL_TO_DELETE = 'CHOOSE_PUPIL_TO_DELETE';
@@ -18,6 +22,9 @@ const state = {
 };
 
 const mutations = {
+    [SET_PARALLELS_LIST](state, newParallelsList) {
+        state.parallels = newParallelsList;
+    },
     [CHOOSE_PARALLEL_TO_RENDER](state, payload) {
         const { parallelId, parallelNumber } = payload;
         state.choosedParallelId = parallelId;
@@ -59,19 +66,33 @@ const mutations = {
         changedPupilList[pupilId].isChoosed = !changedPupilList[pupilId].isChoosed;
         state.choosedClassPupilList = changedPupilList;
     },
-    [APPROVE_PUPIL_LIST_CHANGES](state) {
+    [APPROVE_PUPIL_LIST_CHANGES](state, newParallelsList) {
+        state.parallels = newParallelsList;
+    },
+};
+
+const actions = {
+    approvePupilListChanges({ commit, state }) {
         const newParallelsList = JSON.parse(JSON.stringify(state.parallels));
         const classId = newParallelsList[state.choosedParallelId].classes.findIndex((classObj) => {
             return classObj.letter === state.choosedClassLetter;
         });
         newParallelsList[state.choosedParallelId].classes[classId].pupils = state.tempPupilList;
 
-        state.parallels = newParallelsList;
+        HTTP.post('approvepupullistchanges', {
+            parallels: newParallelsList,
+        })
+            .then(() => {
+                commit('APPROVE_PUPIL_LIST_CHANGES', newParallelsList);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     },
 };
-
 
 export default {
     state,
     mutations,
+    actions,
 };

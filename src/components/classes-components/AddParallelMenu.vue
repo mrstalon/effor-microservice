@@ -77,7 +77,7 @@ export default {
                 return;
             }
             if (!this.$store.state.classesModule.createdParallelsNumbers.includes(this.parallelToAddNumber)) {
-                this.$store.commit('ADD_PARALLEL', this.parallelToAddNumber);
+                this.$store.dispatch('addParallel', this.parallelToAddNumber);
                 this.$store.commit('CLEAR_ARRAY_OF_LETTERS_TO_ADD');
                 this.$store.commit('MAKE_STATE_OF_ALPHABET_INITIAL');
                 this.$emit('close');

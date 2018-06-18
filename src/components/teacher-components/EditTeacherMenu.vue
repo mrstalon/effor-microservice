@@ -62,7 +62,7 @@ export default {
             this.$store.commit('CHOOSE_LETTER', {parallelId: this.choosedParallelId, letter: letter});
         },
         approveTeacherChanges() {
-            this.$store.commit('APPROVE_TEACHER_CHANGES');
+            this.$store.dispatch('approveTeacherChanges');
             this.$emit('close');
         },
     }
