@@ -4,8 +4,8 @@
             <div class="modal-wrapper">
                 <div class="modal-container" @click="preventBubling">
                     <h1><span>Добавление параллели</span></h1>
-                    <div class="error-message-container" v-if="errorMessage">
-                        {{errorMessage}}
+                    <div class="error-message-container" v-if="$store.state.classesModule.errorMessage">
+                        {{$store.state.classesModule.errorMessage}}
                     </div>
                     <div class="choose-parallel-number-container">
                         <span>Введите параллель: </span>
@@ -17,7 +17,7 @@
                         <span
                             v-for="(letterObj, letterId) in $store.state.classesModule.alphabet"
                             :key="letterId"
-                            @click="checkShouldWeAddOrDeleteLetter(letterObj.letter, letterId)"
+                            @click="checkShouldWeAddOrDeleteLetter(letterObj, letterId)"
                             :class="[letterObj.isChoosed ? 'letter-is-choosed' : 'letter-is-not-choosed']"
                         >
                             {{letterObj.letter}}
@@ -42,6 +42,9 @@ export default {
             errorMessage: '',
         }
     },
+    beforeMount() {
+        this.$store.commit('MAKE_STATE_OF_ALPHABET_INITIAL');
+    },
     beforeDestroy() {
         this.$store.commit('MAKE_STATE_OF_ALPHABET_INITIAL');
     },
@@ -57,17 +60,20 @@ export default {
             }
         },
         incrementParNumber() {
-            if (this.parallelToAddNumber === 11) {
+            if (this.parallelToAddNumber === 12) {
                 return;
             } else {
                 this.parallelToAddNumber = this.parallelToAddNumber + 1;
             }
         },
-        checkShouldWeAddOrDeleteLetter(letter, letterId) {
-            if (this.$store.state.classesModule.arrayOfLettersToAdd.includes(letter)) {
-                this.$store.commit('DELETE_LETTER_FROM_ARRAY_OF_LETTERS', letter);
+        checkShouldWeAddOrDeleteLetter(letterObj, letterId) {
+            const arrayOfLettersToAdd = this.$store.state.classesModule.arrayOfLettersToAdd.map(item => {
+                return item.letter;
+            });
+            if (arrayOfLettersToAdd.includes(letterObj.letter)) {
+                this.$store.commit('DELETE_LETTER_FROM_ARRAY_OF_LETTERS', letterObj);
             } else {
-                this.$store.commit('ADD_LETTER_TO_ARRAY_OF_LETTERS', letter);
+                this.$store.commit('ADD_LETTER_TO_ARRAY_OF_LETTERS', letterObj);
             }
             this.$store.commit('CHANGE_IS_LETTER_CHOOSED', letterId);
         },
@@ -86,14 +92,14 @@ export default {
             }
         },
         showErrorMessage(errorMessage) {
-            this.errorMessage = errorMessage;
+            this.$store.commit('SHOW_OR_HIDE_ERROR_MESSAGE', errorMessage);
 
             setTimeout(() => {
                 this.clearErrorMessage();
             }, 4000);
         },
         clearErrorMessage() {
-            this.errorMessage = '';
+            this.$store.commit('SHOW_OR_HIDE_ERROR_MESSAGE', '');
         },
     }
 }

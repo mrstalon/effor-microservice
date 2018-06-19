@@ -23,8 +23,8 @@
                 <td class="teachers-list-cell">
                     <span>{{teacher.firstName}} {{teacher.lastName}}</span>
                     (<span
-                        v-for="(clas, classId) in teacher.classes"
-                        :key="classId">{{clas.parNumber}}-{{clas.classLetter}};
+                        v-for="(classObj, classId) in teacher.classes"
+                        :key="classId">{{classObj.parNumber}}-{{classObj.letter}};
                     </span>)
                 </td>
                 <td class="add-class-button">

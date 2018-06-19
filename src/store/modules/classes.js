@@ -1,7 +1,8 @@
+import HTTP from '../../http-config';
 import axios from 'axios';
 
-import removeElementFromArray from '../../helpers/remove-element-from-array';
 import sortFunctions from '../../helpers/quick-sorts';
+import checkDoWeNeedToMakeRequest from '../../helpers/check-should-we-make-request';
 
 import alphabet from '../../response-mocks/alphabet';
 
@@ -20,6 +21,8 @@ const CHANGE_IS_LETTER_CHOOSED = 'CHANGE_IS_LETTER_CHOOSED';
 const LIGHT_CHOOSED_CLASSES_LETTERS_IN_ALPHABET = 'LIGHT_CHOOSED_CLASSES_LETTERS_IN_ALPHABET';
 const FILL_ARRAY_OF_LETTERS_TO_ADD = 'FILL_ARRAY_OF_LETTERS_TO_ADD';
 const APPROVE_PARALLEL_CHANGES = 'APPROVE_PARALLEL_CHANGES';
+const SHOW_OR_HIDE_ERROR_MESSAGE = 'SHOW_OR_HIDE_ERROR_MESSAGE';
+const CHANGE_EMITTED_EVENT = 'CHANGE_EMITTED_EVENT';
 
 
 const state = {
@@ -27,7 +30,8 @@ const state = {
     createdParallelsNumbers: null,
     alphabet,
     parallels: [],
-    wereTeacherClassesChanged: false,
+    errorMessage: '',
+    emittedEvent: '',
 };
 
 
@@ -40,11 +44,15 @@ const mutations = {
             return parallel.number;
         });
     },
-    [ADD_LETTER_TO_ARRAY_OF_LETTERS](state, letter) {
-        state.arrayOfLettersToAdd.push(letter);
+    [ADD_LETTER_TO_ARRAY_OF_LETTERS](state, letterObj) {
+        state.arrayOfLettersToAdd.push(letterObj);
     },
-    [DELETE_LETTER_FROM_ARRAY_OF_LETTERS](state, letter) {
-        removeElementFromArray(state.arrayOfLettersToAdd, letter);
+    [DELETE_LETTER_FROM_ARRAY_OF_LETTERS](state, letterObj) {
+        const letterId = state.arrayOfLettersToAdd.findIndex((item) => {
+            return letterObj.letter === item.letter;
+        });
+
+        state.arrayOfLettersToAdd.splice(letterId, 1);
     },
     [ADD_PARALLEL](state, payload) {
         const { parallelToAddNumber, newParallelsList } = payload;
@@ -52,16 +60,19 @@ const mutations = {
         state.createdParallelsNumbers.push(parallelToAddNumber);
         state.createdParallelsNumbers = quickSort(state.createdParallelsNumbers);
 
+        console.log(newParallelsList);
         state.parallels = newParallelsList;
     },
     [CLEAR_ARRAY_OF_LETTERS_TO_ADD](state) {
         state.arrayOfLettersToAdd = [];
     },
     [MAKE_STATE_OF_ALPHABET_INITIAL](state) {
-        state.alphabet = state.alphabet.map((item) => {
+        state.alphabet = state.alphabet.map((item, index) => {
+            const id = index + 1;
             return {
                 ...item,
                 isChoosed: false,
+                letterPosition: id,
             };
         });
     },
@@ -69,10 +80,8 @@ const mutations = {
         const newAlphabet = JSON.parse(JSON.stringify(state.alphabet));
         newAlphabet[letterId].isChoosed = !newAlphabet[letterId].isChoosed;
         state.alphabet = newAlphabet;
-        state.wereTeacherClassesChanged = true;
     },
     [LIGHT_CHOOSED_CLASSES_LETTERS_IN_ALPHABET](state, parallelNumber) {
-        console.log(state);
         const classesLetters = JSON.parse(JSON.stringify(state.parallels[parallelNumber].classes)).map((item) => {
             return item.letter;
         });
@@ -99,7 +108,7 @@ const mutations = {
     [FILL_ARRAY_OF_LETTERS_TO_ADD](state, parallelId) {
         // filling arrayOfLettersToAdd with already added letters(making arrayOfLettersToAdd state initial)
         state.arrayOfLettersToAdd = JSON.parse(JSON.stringify(state.parallels[parallelId].classes)).map((item) => {
-            return item.letter;
+            return item;
         });
         state.wereTeacherClassesChanged = false;
     },
@@ -107,14 +116,26 @@ const mutations = {
         // approving changes of parallel data
         state.parallels = newParallelsList;
     },
+    [SHOW_OR_HIDE_ERROR_MESSAGE](state, errorMessage) {
+        state.errorMessage = errorMessage;
+    },
+    [CHANGE_EMITTED_EVENT](state, newEvent) {
+        state.emittedEvent = newEvent;
+    },
 };
 
 const actions = {
     getParallelsList({ commit }) {
-        axios({
-            url: 'http://192.168.1.39:8090/teacher/api/getparallels',
-            method: 'get',
-            withCredentials: true,
+        HTTP.get('getparallels', {
+            validateStatus(status) {
+                console.log(status);
+                // if (status === 403) {
+                //     const urlToRedirect = 'http://192.168.1.39:8090/schoolsettings';
+                //     console.log(urlToRedirect);
+                //     window.location.replace(urlToRedirect);
+                // }
+                // return true;
+            },
         })
             .then((response) => {
                 console.log(response);
@@ -122,6 +143,7 @@ const actions = {
             })
             .catch((error) => {
                 console.log(error);
+                console.log(error.response);
             });
     },
     addParallel({ commit, state }, parallelToAddNumber) {
@@ -130,30 +152,26 @@ const actions = {
         const parallelToAdd = {
             number: parallelToAddNumber,
         };
-
         const classes = JSON.parse(JSON.stringify(state.arrayOfLettersToAdd)).map((item) => {
+            const objectToReturn = item;
+            delete objectToReturn.isChoosed;
+            delete objectToReturn.isClicked;
             return {
-                letter: item,
+                ...objectToReturn,
             };
         });
+
         parallelToAdd.classes = quickAlphabetSort(classes);
-
-
         newParallelsList.push(parallelToAdd);
-        newParallelsList = quickParallelsSort(state.parallels);
-        newParallelsList = state.parallels.map((parallel, id) => {
+        newParallelsList = quickParallelsSort(newParallelsList);
+        newParallelsList = newParallelsList.map((parallel, id) => {
             return {
                 ...parallel,
                 id,
             };
         });
 
-        axios({
-            url: 'http://192.168.1.39:8090/teacher/api/approveparallelchanges',
-            method: 'post',
-            data: { data: JSON.stringify(parallelToAdd) },
-            withCredentials: true,
-        })
+        HTTP.put('approveparallelchanges', parallelToAdd)
             .then(() => {
                 commit('ADD_PARALLEL', {
                     parallelToAddNumber,
@@ -166,47 +184,53 @@ const actions = {
     },
     approveParallelChanges({ commit, state }, payload) {
         // check were teacher classes changed
+
         const { parallelId, parallelNumber } = payload;
 
-        // console.log(state.parallels[parallelId].classes);
-        // console.log(state.arrayOfLettersToAdd);
-        // if (JSON.stringify(state.parallels[parallelId].classes) == JSON.stringify(state.arrayOfLettersToAdd.forEach(()))) {
-        //     console.log('return');
-        // }
+        if (checkDoWeNeedToMakeRequest(state.parallels[parallelId].classes, state.arrayOfLettersToAdd)) {
+            commit('CHANGE_EMITTED_EVENT', 'close');
+            return;
+        }
 
         const newParallelsList = JSON.parse(JSON.stringify(state.parallels));
-
         const classes = JSON.parse(JSON.stringify(state.arrayOfLettersToAdd)).map((item) => {
+            const objectToReturn = item;
+            delete objectToReturn.isChoosed;
+            delete objectToReturn.isClicked;
             return {
-                ...item,
-                letter: item,
+                ...objectToReturn,
             };
         });
-
-        console.log(classes);
-
         const newParallel = {
             number: parallelNumber,
             classes,
         };
 
-        console.log(JSON.stringify(newParallel));
+        if (newParallel.classes.length === 0) {
+            newParallelsList.splice(parallelId, 1);
+        } else {
+            newParallelsList.splice(parallelId, 1, newParallel);
+        }
 
-        newParallelsList.splice(parallelId, 1, newParallel);
-
-
-        axios({
-            url: 'http://192.168.1.39:8090/teacher/api/approveparallelchanges',
-            method: 'post',
-            data: newParallel,
-            // data: JSON.stringify(newParallel),
-            withCredentials: true,
+        HTTP.put('approveparallelchanges', newParallel, {
+            // validateStatus(status) {
+            //     if (status !== 200) {
+            //         console.log(status);
+            //     }
+            // },
         })
-            .then(() => {
+            .then((response) => {
+                console.log(response);
                 commit('APPROVE_PARALLEL_CHANGES', newParallelsList);
+                commit('CHANGE_EMITTED_EVENT', 'close');
             })
             .catch((error) => {
-                console.log(error);
+                console.log(error.response);
+                commit('SHOW_OR_HIDE_ERROR_MESSAGE', error.response.data.description);
+                commit('CHANGE_EMITTED_EVENT', '');
+                setTimeout(() => {
+                    commit('SHOW_OR_HIDE_ERROR_MESSAGE', '');
+                }, 4000);
             });
     },
 };
