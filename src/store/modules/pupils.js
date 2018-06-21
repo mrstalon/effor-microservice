@@ -16,6 +16,7 @@ const state = {
     choosedParallelId: 0,
     choosedParallelNumber: 1,
     choosedClassLetter: null,
+    choosedClassLetterPosition: null,
     choosedClassId: null,
     choosedClassPupilList: [],
     tempPupilList: [],
@@ -79,8 +80,15 @@ const actions = {
         });
         newParallelsList[state.choosedParallelId].classes[classId].pupils = state.tempPupilList;
 
-        HTTP.post('approvepupullistchanges', {
-            parallels: newParallelsList,
+        HTTP.put('approvepupullistchanges', { }, {
+            validateStatus(status) {
+                // 403 status code means that user is not authoraized.then(redirect user to login form)
+                if (status === 403) {
+                    const urlToRedirect = 'http://192.168.1.39:8090/teacher/schoolsettings';
+                    window.location.replace(urlToRedirect);
+                }
+                return true;
+            },
         })
             .then(() => {
                 commit('APPROVE_PUPIL_LIST_CHANGES', newParallelsList);
@@ -88,6 +96,13 @@ const actions = {
             .catch((error) => {
                 console.log(error);
             });
+    },
+    validateUserLogin({ commit, state }, userLogin) {
+        const objectToSend = {
+            userLogin,
+            parNumber: state.choosedParallelNumber,
+            classLetter: state.choosedClassLetter,
+        };
     },
 };
 

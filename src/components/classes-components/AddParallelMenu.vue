@@ -83,10 +83,11 @@ export default {
                 return;
             }
             if (!this.$store.state.classesModule.createdParallelsNumbers.includes(this.parallelToAddNumber)) {
-                this.$store.dispatch('addParallel', this.parallelToAddNumber);
+                this.$store.dispatch('addParallel', this.parallelToAddNumber)
+                    .then(() => {
+                        this.$emit(this.$store.state.classesModule.emittedEvent);
+                    });
                 this.$store.commit('CLEAR_ARRAY_OF_LETTERS_TO_ADD');
-                this.$store.commit('MAKE_STATE_OF_ALPHABET_INITIAL');
-                this.$emit('close');
             } else {
                 this.showErrorMessage('Параллель с таким номером уже существует');
             }

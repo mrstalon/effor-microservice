@@ -67,12 +67,13 @@ export default {
         checkShouldWeApproveChanges() {
             if (this.$store.state.classesModule.arrayOfLettersToAdd.length >= 0) {
                 this.$store.dispatch('approveParallelChanges', {parallelId: this.parallelId, parallelNumber: this.parallelNumber})
-                this.$emit(this.$store.state.classesModule.emittedEvent);
+                    .then(()=> {
+                        this.$emit(this.$store.state.classesModule.emittedEvent);
+                    });
             }
         },
         addErrorMessage(errorMessage) {
             this.$store.commit('SHOW_OR_HIDE_ERROR_MESSAGE', errorMessage);
-
             setTimeout(() => {
                 this.clearErrorMessage();
             }, 4000);

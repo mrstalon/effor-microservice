@@ -5,8 +5,7 @@
             @close="isEditTeacherMenuShown = false"
         />
         <error-message
-            v-if="errorMessage"
-            @close="errorMessage = ''" :errorMessage="errorMessage"
+            v-if="$store.state.teachersModule.errorMessage"
         />
         <table class="teachers-info-table">
             <tr class="teachers-info-table-header">
@@ -38,7 +37,7 @@
                     </button>
                 </td>
                 <td>
-                    <button class="settings-remove-button" @click="checkCanTeacherBeRemoved(teacherId)">
+                    <button class="settings-remove-button" @click="checkCanTeacherBeRemoved(teacher, teacherId)">
                         <img
                             title="Удалить учителя из школы"
                             class="settings-remove-icon"
@@ -69,7 +68,6 @@ export default {
     data() {
         return {
             isEditTeacherMenuShown: false,
-            errorMessage: '',
         }
     },
     methods: {
@@ -77,15 +75,15 @@ export default {
             this.isEditTeacherMenuShown = true;
             this.$store.commit('CHANGE_CHOOSED_TEACHER', teacherId);
         },
-        checkCanTeacherBeRemoved(teacherId) {
+        checkCanTeacherBeRemoved(teacher ,teacherId) {
             if (this.$store.state.teachersModule.teachers[teacherId].classes.length === 0) {
-                this.$store.dispatch('removeTeacher', teacherId);
+                this.$store.dispatch('removeTeacher', {teacherId, teacherDataBaseId: teacher.dataBaseId});
             } else {
                 this.showErrorMessage('Невозможно удалить учителя, так как к нему привязаны классы');
             }
         },
         showErrorMessage(errorMessage) {
-            this.errorMessage = errorMessage;
+            this.$store.commit('SHOW_OR_HIDE_ERROR_MESSAGE', errorMessage);
         },
     }
 };

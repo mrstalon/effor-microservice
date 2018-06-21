@@ -1,7 +1,9 @@
 import HTTP from '../../http-config';
 
-
+import findLetterPosition from '../../helpers/find-letter-position';
 import sortFunctions from '../../helpers/quick-sorts';
+
+import alphabet from '../../response-mocks/alphabet';
 
 const { quickTeacherClassesSort } = sortFunctions;
 
@@ -14,6 +16,8 @@ const CHOOSE_PARALLEL = 'CHOOSE_PARALLEL';
 const CHOOSE_LETTER = 'CHOOSE_LETTER';
 const APPROVE_TEACHER_CHANGES = 'APPROVE_TEACHER_CHANGES';
 const REMOVE_TEACHER = 'REMOVE_TEACHER';
+const SHOW_OR_HIDE_ERROR_MESSAGE = 'SHOW_OR_HIDE_ERROR_MESSAGE';
+const CHANGE_EMITTED_EVENT = 'CHANGE_EMITTED_EVENT';
 
 
 const state = {
@@ -22,6 +26,8 @@ const state = {
     choosedParallel: null,
     tempTeacher: null,
     tempClasses: null,
+    errorMessage: '',
+    emittedEvent: '',
 };
 
 const mutations = {
@@ -29,11 +35,35 @@ const mutations = {
         state.parallels = newParallelsList;
     },
     [SET_TEACHERS_LIST](state, newTeachersList) {
-        state.teachers = newTeachersList;
+        state.teachers = newTeachersList.map((teacher, index) => {
+            return {
+                ...teacher,
+                dataBaseId: teacher.id,
+                id: index,
+            };
+        });
+        // state.teachers = state.teachers.map((teacher) => {
+        //     return {
+        //         ...teacher,
+        //         classes: teacher.classes.map((classObj) => {
+        //             return {
+        //                 ...classObj,
+        //                 number: classObj.parNumber,
+        //             };
+        //         }),
+        //     };
+        // });
     },
     [CHANGE_CHOOSED_TEACHER](state, newTeacherId) {
         // changing choosed teacher + lighting parallels and classes teached by this teacher
         const newChoosedTeacher = JSON.parse(JSON.stringify(state.teachers[newTeacherId]));
+        // newChoosedTeacher.classes = newChoosedTeacher.classes.map((classObj) => {
+        //     const objToReturn = {
+        //         ...classObj,
+        //     };
+        //     delete objToReturn.parNumber;
+        //     return objToReturn;
+        // });
         let newTempParallels = JSON.parse(JSON.stringify(state.parallels));
 
         newTempParallels = newTempParallels.map((item) => {
@@ -67,7 +97,7 @@ const mutations = {
                 return parallel.number === item.parNumber;
             });
             const id = newTempParallels[parallelId].classes.findIndex((classObj) => {
-                return classObj.letter === item.classLetter;
+                return classObj.letter === item.letter;
             });
             if (id >= 0) {
                 newTempParallels[parallelId].classes[id].isChoosed = true;
@@ -111,11 +141,11 @@ const mutations = {
             return parallel.id === parallelId;
         }).number;
 
+
         if (state.choosedParallel.classes[letterId].isChoosed === true) {
             // deleting this class from tempClasses and set isChoosed of this letter to false
-
             const classId = state.tempClasses.findIndex((classObj) => {
-                return classObj.classLetter === letter && classObj.parNumber === parallelNumber;
+                return classObj.letter === letter && classObj.parNumber === parallelNumber;
             });
 
             state.tempClasses.splice(classId, 1);
@@ -124,10 +154,12 @@ const mutations = {
             state.choosedParallel = choosedParallel;
         } else {
             // adding this class to tempClasses and set isChoosed of this letter to true
+            const letterPosition = findLetterPosition(alphabet, letter);
 
             state.tempClasses.push({
                 parNumber: parallelNumber,
-                classLetter: letter,
+                letter,
+                letterPosition,
             });
             const choosedParallel = JSON.parse(JSON.stringify(state.choosedParallel));
             choosedParallel.classes[letterId].isChoosed = true;
@@ -141,11 +173,26 @@ const mutations = {
     [REMOVE_TEACHER](state, newTeachersList) {
         state.teachers = newTeachersList;
     },
+    [SHOW_OR_HIDE_ERROR_MESSAGE](state, errorMessage) {
+        state.errorMessage = errorMessage;
+    },
+    [CHANGE_EMITTED_EVENT](state, event) {
+        state.emittedEvent = event;
+    },
 };
 
 const actions = {
     getTeachersList({ commit }) {
-        HTTP.get('getteachers')
+        HTTP.get('getteachers', {
+            validateStatus(status) {
+                // 403 status code means that user is not authoraized.then(redirect user to login form)
+                if (status === 403) {
+                    const urlToRedirect = 'http://192.168.1.39:8090/teacher/schoolsettings';
+                    window.location.replace(urlToRedirect);
+                }
+                return true;
+            },
+        })
             .then((response) => {
                 console.log(response.data);
                 commit('SET_TEACHERS_LIST', response.data.teachers);
@@ -163,17 +210,39 @@ const actions = {
         };
         newTeachersList.splice(tempTeacher.id, 1, newTeacher);
 
-        HTTP.put('approveteacherchanges', {
-            teacher: newTeacher,
-        })
-            .then(() => {
-                commit('APPROVE_TEACHER_CHANGES', newTeachersList);
+        console.log(newTeacher);
+
+        return new Promise((resolve) => {
+            HTTP.put('approveteacherchanges', { teacher: newTeacher }, {
+                validateStatus(status) {
+                    // 403 status code means that user is not authoraized.then(redirect user to login form)
+                    if (status === 403) {
+                        const urlToRedirect = 'http://192.168.1.39:8090/teacher/schoolsettings';
+                        window.location.replace(urlToRedirect);
+                    }
+                    return true;
+                },
             })
-            .catch((error) => {
-                console.log(error);
-            });
+                .then(() => {
+                    commit('APPROVE_TEACHER_CHANGES', newTeachersList);
+                    commit('CHANGE_EMITTED_EVENT', 'close');
+                    console.log('resolve');
+                    resolve();
+                })
+                .catch((error) => {
+                    console.log('error');
+                    commit('SHOW_OR_HIDE_ERROR_MESSAGE', error.response.data.description);
+                    commit('CHANGE_EMITTED_EVENT', '');
+                    setTimeout(() => {
+                        // hide error message in 4 seconds
+                        commit('SHOW_OR_HIDE_ERROR_MESSAGE', '');
+                    }, 4000);
+                    resolve();
+                });
+        });
     },
-    removeTeacher({ commit, state }, teacherId) {
+    removeTeacher({ commit, state }, payload) {
+        const { teacherId, teacherDataBaseId } = payload;
         let newTeachersList = JSON.parse(JSON.stringify(state.teachers));
 
         newTeachersList.splice(teacherId, 1);
@@ -185,14 +254,28 @@ const actions = {
             };
         });
 
-        HTTP.post('removeteacher', {
-            teachers: newTeachersList,
+        console.log(teacherDataBaseId);
+        HTTP.put('deleteteacher', { teacherId: teacherDataBaseId }, {
+            validateStatus(status) {
+                // 403 status code means that user is not authoraized.then(redirect user to login form)
+                if (status === 403) {
+                    const urlToRedirect = 'http://192.168.1.39:8090/teacher/schoolsettings';
+                    window.location.replace(urlToRedirect);
+                }
+                return true;
+            },
         })
             .then(() => {
                 commit('REMOVE_TEACHER', newTeachersList);
+                commit('SHOW_OR_HIDE_ERROR_MESSAGE', '');
             })
             .catch((error) => {
-                console.log(error);
+                // commit('SHOW_OR_HIDE_ERROR_MESSAGE', error.response.data.description);
+                commit('SHOW_OR_HIDE_ERROR_MESSAGE', 'Произошла ошибка при отправке запроса');
+                setTimeout(() => {
+                    // hide error message in 4 seconds
+                    commit('SHOW_OR_HIDE_ERROR_MESSAGE', '');
+                }, 4000);
             });
     },
 };

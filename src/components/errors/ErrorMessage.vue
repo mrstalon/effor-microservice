@@ -5,10 +5,10 @@
                 <div class="modal-container" @click="preventBubling">
                     <h1>Ошибка!</h1>
                     <div class="error-message-container">
-                        {{errorMessage}}
+                        {{$store.state.teachersModule.errorMessage}}
                     </div>
                     <div class="button-container">
-                        <button @click="$emit('close')">Закрыть</button>
+                        <button @click="hideErrorMessageMenu()">Закрыть</button>
                     </div>
                 </div>
             </div>
@@ -19,16 +19,13 @@
 
 <script>
 export default {
-    props: {
-        errorMessage: {
-            type: String,
-            required: true,
-        },
-    },
     methods: {
         preventBubling(e) {
             e.stopPropagation();
         },
+        hideErrorMessageMenu() {
+            this.$store.commit('SHOW_OR_HIDE_ERROR_MESSAGE', '');
+        }
     }
 }
 </script>

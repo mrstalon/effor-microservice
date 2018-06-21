@@ -43,6 +43,7 @@ export default {
             if (!(this.userInput.trim() == '')) {
                 // here should be verification of user input
                 // specifically if login can be added and etc...
+                this.$store.dispatch('validateUserLogin', this.userInput);
                 this.$emit('close');
             } else {
                 this.showErrorMessage('Логин не может быть пустой строкой');

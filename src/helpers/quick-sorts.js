@@ -57,7 +57,7 @@ const quickTeacherClassesSort = function quickTeacherClassesSort(array) {
         if (item.parNumber > pivot.parNumber) {
             return item;
         } else if (item.parNumber === pivot.parNumber) {
-            if (item.classLetter > pivot.classLetter) {
+            if (item.letter > pivot.letter) {
                 return item;
             }
         }
@@ -67,7 +67,7 @@ const quickTeacherClassesSort = function quickTeacherClassesSort(array) {
         if (item.parNumber < pivot.parNumber) {
             return item;
         } else if (item.parNumber === pivot.parNumber) {
-            if (item.classLetter < pivot.classLetter) {
+            if (item.letter < pivot.letter) {
                 return item;
             }
         }

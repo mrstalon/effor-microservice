@@ -1,4 +1,8 @@
 const checkDoWeNeedToMakeRequest = function areArraysEquil(arr1, arr2) {
+    if (arr1.length !== arr2.length) {
+        return false;
+    }
+
     const arr1Length = arr1.length;
     const arr1copy = JSON.parse(JSON.stringify(arr1));
     const arr2copy = JSON.parse(JSON.stringify(arr2));

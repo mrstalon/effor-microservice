@@ -4,7 +4,10 @@
             <div class="modal-wrapper">
                 <div class="modal-container" @click="preventBubling">
                     <h1><span>Классы: {{$store.state.teachersModule.tempTeacher.name}}</span></h1>
-                    <div>Выберите параллель:</div>
+                    <div v-if="$store.state.teachersModule.errorMessage" class="error-message-container">
+                        {{$store.state.teachersModule.errorMessage}}
+                    </div>
+                    <div class="choose-parallel-headline">Выберите параллель:</div>
                     <div class="parallel-list-container">
                         <span
                             class="parallel-number"
@@ -62,8 +65,10 @@ export default {
             this.$store.commit('CHOOSE_LETTER', {parallelId: this.choosedParallelId, letter: letter});
         },
         approveTeacherChanges() {
-            this.$store.dispatch('approveTeacherChanges');
-            this.$emit('close');
+            this.$store.dispatch('approveTeacherChanges')
+                .then(() => {
+                    this.$emit(this.$store.state.teachersModule.emittedEvent);
+                });
         },
     }
 }
@@ -113,7 +118,7 @@ export default {
     font-weight: 400;
 }
 
-.modal-container > :nth-child(2) {
+.choose-parallel-headline {
     margin-left: 15px;
     margin-top: 5px;
 }
@@ -224,6 +229,11 @@ export default {
     margin-right: 4px;
     margin-left: 4px;
     padding-top: 6px;
+}
+
+.error-message-container {
+    color: red;
+    text-align: center;
 }
 
 @media (max-width: 850px) {

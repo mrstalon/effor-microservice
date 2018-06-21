@@ -1,5 +1,4 @@
 import HTTP from '../../http-config';
-import axios from 'axios';
 
 import sortFunctions from '../../helpers/quick-sorts';
 import checkDoWeNeedToMakeRequest from '../../helpers/check-should-we-make-request';
@@ -59,8 +58,6 @@ const mutations = {
 
         state.createdParallelsNumbers.push(parallelToAddNumber);
         state.createdParallelsNumbers = quickSort(state.createdParallelsNumbers);
-
-        console.log(newParallelsList);
         state.parallels = newParallelsList;
     },
     [CLEAR_ARRAY_OF_LETTERS_TO_ADD](state) {
@@ -68,6 +65,8 @@ const mutations = {
     },
     [MAKE_STATE_OF_ALPHABET_INITIAL](state) {
         state.alphabet = state.alphabet.map((item, index) => {
+            // this code is nessecery for backend part of the app
+            // because class letters are stored in database as numbers(letterPosition)
             const id = index + 1;
             return {
                 ...item,
@@ -110,7 +109,6 @@ const mutations = {
         state.arrayOfLettersToAdd = JSON.parse(JSON.stringify(state.parallels[parallelId].classes)).map((item) => {
             return item;
         });
-        state.wereTeacherClassesChanged = false;
     },
     [APPROVE_PARALLEL_CHANGES](state, newParallelsList) {
         // approving changes of parallel data
@@ -128,13 +126,12 @@ const actions = {
     getParallelsList({ commit }) {
         HTTP.get('getparallels', {
             validateStatus(status) {
-                console.log(status);
-                // if (status === 403) {
-                //     const urlToRedirect = 'http://192.168.1.39:8090/schoolsettings';
-                //     console.log(urlToRedirect);
-                //     window.location.replace(urlToRedirect);
-                // }
-                // return true;
+                // 403 status code means that user is not authoraized.then(redirect user to login form)
+                if (status === 403) {
+                    const urlToRedirect = 'http://192.168.1.39:8090/teacher/schoolsettings';
+                    window.location.replace(urlToRedirect);
+                }
+                return true;
             },
         })
             .then((response) => {
@@ -171,16 +168,40 @@ const actions = {
             };
         });
 
-        HTTP.put('approveparallelchanges', parallelToAdd)
-            .then(() => {
-                commit('ADD_PARALLEL', {
-                    parallelToAddNumber,
-                    newParallelsList,
-                });
+        return new Promise((resolve) => {
+            HTTP.put('approveparallelchanges', parallelToAdd, {
+                validateStatus(status) {
+                    // 403 status code means that user is not authoraized.then(redirect user to login form)
+                    if (status === 403) {
+                        const urlToRedirect = 'https://temp1.effor.by/teacher/schoolsettings';
+                        window.location.replace(urlToRedirect);
+                    }
+                    return true;
+                },
             })
-            .catch((error) => {
-                console.log(error);
-            });
+                .then(() => {
+                    commit('ADD_PARALLEL', {
+                        parallelToAddNumber,
+                        newParallelsList,
+                    });
+                    // updating createdParallelsNumbers because parallels array was changed
+                    commit('INITIALIZE_CREATED_PARALLELS_NUMBERS');
+                    // everything is fine so we need to emit "close" event
+                    commit('CHANGE_EMITTED_EVENT', 'close');
+                    resolve();
+                })
+                .catch((error) => {
+                    console.log(error);
+                    commit('SHOW_OR_HIDE_ERROR_MESSAGE', error.response.data.description);
+                    // an error occured so we don't need to emit "close" event
+                    commit('CHANGE_EMITTED_EVENT', '');
+                    setTimeout(() => {
+                        // hide error message in 4 seconds
+                        commit('SHOW_OR_HIDE_ERROR_MESSAGE', '');
+                    }, 4000);
+                    resolve();
+                });
+        });
     },
     approveParallelChanges({ commit, state }, payload) {
         // check were teacher classes changed
@@ -188,6 +209,7 @@ const actions = {
         const { parallelId, parallelNumber } = payload;
 
         if (checkDoWeNeedToMakeRequest(state.parallels[parallelId].classes, state.arrayOfLettersToAdd)) {
+            console.log('close');
             commit('CHANGE_EMITTED_EVENT', 'close');
             return;
         }
@@ -212,26 +234,37 @@ const actions = {
             newParallelsList.splice(parallelId, 1, newParallel);
         }
 
-        HTTP.put('approveparallelchanges', newParallel, {
-            // validateStatus(status) {
-            //     if (status !== 200) {
-            //         console.log(status);
-            //     }
-            // },
-        })
-            .then((response) => {
-                console.log(response);
-                commit('APPROVE_PARALLEL_CHANGES', newParallelsList);
-                commit('CHANGE_EMITTED_EVENT', 'close');
+        return new Promise((resolve) => {
+            HTTP.put('approveparallelchanges', newParallel, {
+                validateStatus(status) {
+                    // 403 status code means that user is not authoraized.then(redirect user to login form)
+                    if (status === 403) {
+                        const urlToRedirect = 'https://temp1.effor.by/teacher/schoolsettings';
+                        window.location.replace(urlToRedirect);
+                    }
+                    return true;
+                },
             })
-            .catch((error) => {
-                console.log(error.response);
-                commit('SHOW_OR_HIDE_ERROR_MESSAGE', error.response.data.description);
-                commit('CHANGE_EMITTED_EVENT', '');
-                setTimeout(() => {
-                    commit('SHOW_OR_HIDE_ERROR_MESSAGE', '');
-                }, 4000);
-            });
+                .then(() => {
+                    commit('APPROVE_PARALLEL_CHANGES', newParallelsList);
+                    // updating createdParallelsNumbers because parallels array was changed
+                    commit('INITIALIZE_CREATED_PARALLELS_NUMBERS');
+                    // everything is fine so we need to emit "close" event
+                    commit('CHANGE_EMITTED_EVENT', 'close');
+                    resolve();
+                })
+                .catch((error) => {
+                    console.log(error);
+                    commit('SHOW_OR_HIDE_ERROR_MESSAGE', error.response.data.description);
+                    // an error occured so we don't need to emit "close" event
+                    commit('CHANGE_EMITTED_EVENT', '');
+                    setTimeout(() => {
+                        // hide error message in 4 seconds
+                        commit('SHOW_OR_HIDE_ERROR_MESSAGE', '');
+                    }, 4000);
+                    resolve();
+                });
+        });
     },
 };
 

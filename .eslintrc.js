@@ -33,6 +33,7 @@ module.exports = {
                 ],
             },
         ],
+        "consistent-return": "off",
         "no-console": "off",
         "vue/html-indent": ["error", 4],
         "vue/max-attributes-per-line": [2, {
