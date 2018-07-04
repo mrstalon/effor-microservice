@@ -1,50 +1,50 @@
 <template>
     <div class="nav-container-desktop" @click="preventBubling">
-        <a href="http://192.168.0.104:8090/teacher">
+        <a href="">
             <div>
-                <img src="../../assets/profile-icon.png" alt="Could not load an image">
+                <img src="../../../assets/profile-icon.png" alt="Could not load an image">
             </div>
             <span>Профиль</span>
         </a>
-        <a href="">
+        <a href="http://192.168.1.38:8080/school">
             <div>
-                <img src="../../assets/school-monitoring-icon.png" alt="Could not load an image">
+                <img src="../../../assets/school-monitoring-icon.png" alt="Could not load an image">
             </div>
             <span>Школа</span>
         </a>
         <a href="">
             <div>
-                <img src="../../assets/school-monitoring-icon.png" alt="Could not load an image">
+                <img src="../../../assets/school-monitoring-icon.png" alt="Could not load an image">
             </div>
             <span>Мониторинг</span>
         </a>
         <a href="">
             <div>
-                <img src="../../assets/pupils-icon.png" alt="Could not load an image">
+                <img src="../../../assets/pupils-icon.png" alt="Could not load an image">
             </div>
             <span>Ученики</span>
         </a>
-        <a href="">
+        <a href="http://192.168.1.38:8080/materials">
             <div>
-                <img src="../../assets/materials-icon.png" alt="Could not load an image">
+                <img src="../../../assets/materials-icon.png" alt="Could not load an image">
             </div>
             <span>Материалы</span>
         </a>
         <a href="">
             <div>
-                <img src="../../assets/license-icon.png" alt="Could not load an image">
+                <img src="../../../assets/license-icon.png" alt="Could not load an image">
             </div>
             <span>Лицензия</span>
         </a>
         <a href="">
             <div>
-                <img src="../../assets/tournament-icon.png" alt="Could not load an image">
+                <img src="../../../assets/tournament-icon.png" alt="Could not load an image">
             </div>
             <span>Турниры</span>
         </a>
         <a href="">
             <div>
-                <img src="../../assets/logout-icon.png" alt="Could not load an image">
+                <img src="../../../assets/logout-icon.png" alt="Could not load an image">
         </div>
         <span>Выход</span>
         </a>
@@ -57,7 +57,7 @@ export default {
     methods: {
         preventBubling(e) {
             e.stopPropagation();
-        }
+        },
     }
 }
 </script>

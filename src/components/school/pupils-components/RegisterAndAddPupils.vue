@@ -3,7 +3,7 @@
         <div class="modal-mask" >
             <div class="modal-wrapper">
                 <div @click="preventBubling">
-                    <div class="modal-container" v-if="!errorMessage">
+                    <div class="modal-container" v-if="!$store.state.pupilsModule.errorMessage">
                         <h1><span>Добавление новых учеников</span></h1>
                         <div class="choose-checkboxes-container">
                             <span>Выберите класс: </span>
@@ -30,10 +30,10 @@
                             <button @click="$emit('close')">Закрыть</button>
                         </div>
                     </div>
-                    <div class="modal-container" v-if="errorMessage">
+                    <div class="modal-container" v-if="$store.state.pupilsModule.errorMessage">
                         <h1>Ошибка!</h1>
                         <div class="error-message-container">
-                            <span>{{errorMessage}}</span>
+                            <span>{{$store.state.pupilsModule.errorMessage}}</span>
                             <span>{{additionalErrorMessage}}</span>
                         </div>
                         <div class="buttons-container">
@@ -49,6 +49,9 @@
 
 
 <script>
+import alphabet from '../../../response-mocks/alphabet';
+import findLetterPosition from '../../../helpers/find-letter-position';
+
 export default {
     data() {
         return {
@@ -58,6 +61,7 @@ export default {
             errorMessage: '',
             additionalErrorMessage: '',
             usersToRegisterList: [],
+            lines: [],
         }
     },
     methods: {
@@ -74,11 +78,14 @@ export default {
             }
 
             if (!this.validateLinesData()) {
-                console.log('false');
                 return false;
             }
 
-            console.log('validation passed!!');
+            this.$store.commit('CHANGE_LETTER_POSITION', findLetterPosition(alphabet, this.choosedClassLetter));
+            this.$store.dispatch('sendNewPupilsLogins', this.userInput.split(' '))
+                .then(() => {
+                    this.$emit(this.$store.state.pupilsModule.emittedEvent);
+                });
         },
         validateSelectData() {
             if (this.choosedParallelNumber && this.choosedClassLetter) {
@@ -96,38 +103,46 @@ export default {
         validateLinesData() {
             let boolToReturn = true;
             let lines = this.devideStringToLinesAndClearThem();
+            console.log(lines);
+            console.log(lines);
+            this.lines = lines;
             lines.forEach((line, index) => {
                 const lineNumber = index + 1;
+                console.log(line)
                 if (line.length < 2) {
                     this.showErrorMessage('Поле ввода должно содержать имя и фамилию ученика, разделённые пробелом', '(Ошибка в строке ' + lineNumber + ')');
+                    this.lines = [];
                     boolToReturn = false;
                 }
 
                 if (boolToReturn && (line[0].length < 3 || line[1].length < 3)) {
                     this.showErrorMessage('Имя и фамилия должны содержать не менее 3 символов', '(Ошибка в строке ' + lineNumber + ')');
+                    this.lines = [];
                     boolToReturn = false;
                 }
             });
             return boolToReturn;
         },
         devideStringToLinesAndClearThem() {
-            // we need to devide string by words NOT BY SPACES
             let lines = this.userInput.split(/\r?\n/);
-            return lines.map((line) => {
-                let words = line.trim().split(/\W+/);
+            lines = lines.map((line) => {
+                let words = line.str.match(/[а-яА-Яa-zA-Z]+/g);
                 if (words.length < 2) {
                     return words;
                 }
                 words.length = 2;
                 return words;
+            }).filter((line) => {
+                return line[0].trim() !== '' && line[1].trim() !== '';
             });
+            return lines;
         },
         showErrorMessage(errorMessage, additionalErrorMessage = '') {
-            this.errorMessage = errorMessage;
+            this.$store.commit('SHOW_OR_HIDE_ERROR_MESSAGE', errorMessage);
             this.additionalErrorMessage = additionalErrorMessage;
         },
         clearErrorMessage() {
-            this.errorMessage = '';
+            this.$store.commit('SHOW_OR_HIDE_ERROR_MESSAGE', '');
         }
     }
 }

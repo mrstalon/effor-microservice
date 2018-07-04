@@ -13,7 +13,7 @@
                 <span class="headline-span">EFFOR.BY</span>
                 <span>– отличная возможность включить в учебный процесс компьютеры, планшеты и смартфоны учащихся, повысить за счет этого его эффективность.</span>
             </div>
-            <img src="../../../assets/about-effor-picture.png">
+            <img src="../../../../assets/about-effor-picture.png">
             <div>
                 <span class="headline-span">Учебные возможности</span>
                 <ul>
@@ -28,7 +28,7 @@
                 </ul>
             </div>
             <span class="headline-span">Соревновательные возможности</span>
-            <img src="../../../assets/about-effor-picture_02.png">
+            <img src="../../../../assets/about-effor-picture_02.png">
             <ul>
                 <li>соревнования между учениками класса, которые проводит педагог;</li>
                 <li>предметные, познавательные и развивающие викторины школы;</li>

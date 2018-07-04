@@ -38,7 +38,7 @@
                         <img
                             title="Редактировать буквы классов"
                             class="settings-edit-icon"
-                            src="../assets/settings_edit_active.png"
+                            src="../../assets/settings_edit_active.png"
                             alt="Could not load an image"
                         >
                     </button>
@@ -50,8 +50,8 @@
 
 
 <script>
-import AddParallelMenu from '../components/classes-components/AddParallelMenu.vue';
-import EditParallelMenu from '../components/classes-components/EditParallelMenu.vue';
+import AddParallelMenu from '../../components/school/classes-components/AddParallelMenu.vue';
+import EditParallelMenu from '../../components/school/classes-components/EditParallelMenu.vue';
 
 export default {
     components: {
@@ -60,6 +60,7 @@ export default {
     },
     beforeMount() {
         this.$store.dispatch('getParallelsList');
+        this.$store.commit('INITIALIZE_CREATED_PARALLELS_NUMBERS');
     },
     data() {
         return {

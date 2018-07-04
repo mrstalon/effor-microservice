@@ -198,7 +198,12 @@ const actions = {
                 commit('SET_TEACHERS_LIST', response.data.teachers);
             })
             .catch((error) => {
-                console.log(error);
+                // commit('SHOW_OR_HIDE_ERROR_MESSAGE', error.response.data.description);
+                commit('SHOW_OR_HIDE_ERROR_MESSAGE', 'Произошла ошибка при отправке запроса');
+                setTimeout(() => {
+                    // hide error message in 4 seconds
+                    commit('SHOW_OR_HIDE_ERROR_MESSAGE', '');
+                }, 4000);
             });
     },
     approveTeacherChanges({ commit, state }) {
@@ -226,18 +231,15 @@ const actions = {
                 .then(() => {
                     commit('APPROVE_TEACHER_CHANGES', newTeachersList);
                     commit('CHANGE_EMITTED_EVENT', 'close');
-                    console.log('resolve');
                     resolve();
                 })
                 .catch((error) => {
-                    console.log('error');
-                    commit('SHOW_OR_HIDE_ERROR_MESSAGE', error.response.data.description);
-                    commit('CHANGE_EMITTED_EVENT', '');
+                    // commit('SHOW_OR_HIDE_ERROR_MESSAGE', error.response.data.description);
+                    commit('SHOW_OR_HIDE_ERROR_MESSAGE', 'Произошла ошибка при отправке запроса');
                     setTimeout(() => {
                         // hide error message in 4 seconds
                         commit('SHOW_OR_HIDE_ERROR_MESSAGE', '');
                     }, 4000);
-                    resolve();
                 });
         });
     },

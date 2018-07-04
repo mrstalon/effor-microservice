@@ -12,8 +12,8 @@
                         >
                     </div>
                     <div class="error-container">
-                        <span v-if="errorMessage">
-                            {{errorMessage}}
+                        <span v-if="$store.state.pupilsModule.errorMessage">
+                            {{$store.state.pupilsModule.errorMessage}}
                         </span>
                     </div>
                     <div class="buttons-container">
@@ -43,21 +43,23 @@ export default {
             if (!(this.userInput.trim() == '')) {
                 // here should be verification of user input
                 // specifically if login can be added and etc...
-                this.$store.dispatch('validateUserLogin', this.userInput);
-                this.$emit('close');
+                this.$store.dispatch('validateUserLogin', this.userInput)
+                    .then(() => {
+                        this.$emit(this.$store.state.pupilsModule.emittedEvent);
+                    });
             } else {
                 this.showErrorMessage('Логин не может быть пустой строкой');
             }
         },
         showErrorMessage(errorMessage) {
-            this.errorMessage = errorMessage;
+            this.$store.commit('SHOW_OR_HIDE_ERROR_MESSAGE', errorMessage);
 
             setTimeout(() => {
                 this.hideErrorMessage();
             }, 4000);
         },
         hideErrorMessage() {
-            this.errorMessage = '';
+            this.$store.commit('SHOW_OR_HIDE_ERROR_MESSAGE', '');
         },
     }
 }

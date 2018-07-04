@@ -31,7 +31,7 @@
                         <img
                             title="Редактировать классы учителя"
                             class="settings-edit-icon"
-                            src="../assets/settings_edit_active.png"
+                            src="../../assets/settings_edit_active.png"
                             alt="Could not load an image"
                         >
                     </button>
@@ -41,7 +41,7 @@
                         <img
                             title="Удалить учителя из школы"
                             class="settings-remove-icon"
-                            src="../assets/settings_remove.png"
+                            src="../../assets/settings_remove.png"
                             alt="Could not load an image"
                         >
                     </button>
@@ -53,8 +53,8 @@
 
 
 <script>
-import EditTeacherMenu from '../components/teacher-components/EditTeacherMenu.vue';
-import ErrorMessage from '../components/errors/ErrorMessage.vue';
+import EditTeacherMenu from '../../components/school/teacher-components/EditTeacherMenu.vue';
+import ErrorMessage from '../../components/school/errors/ErrorMessage.vue';
 
 export default {
     components: {

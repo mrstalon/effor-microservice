@@ -17,11 +17,6 @@
 
 <script>
 export default {
-    data() {
-        return {
-
-        }
-    },
     methods: {
         preventBubling(e) {
             e.stopPropagation();

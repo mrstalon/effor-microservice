@@ -150,7 +150,7 @@ export default {
     cursor: pointer;
     border-radius: 4px;
     text-align: center;
-    background: transparent url('../../assets/zero.png') no-repeat 3px 3px;
+    background: transparent url('../../../assets/zero.png') no-repeat 3px 3px;
     border: 1px solid white;
     color: black;
     margin-right: 4px;
@@ -223,7 +223,7 @@ export default {
     cursor: pointer;
     border-radius: 4px;
     text-align: center;
-    background: transparent url('../../assets/zero.png') no-repeat 3px 3px;
+    background: transparent url('../../../assets/zero.png') no-repeat 3px 3px;
     border: 1px solid white;
     color: black;
     margin-right: 4px;

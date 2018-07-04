@@ -3,28 +3,36 @@
         <div class="modal-mask" >
             <div class="modal-wrapper">
                 <div class="modal-container" @click="preventBubling">
-                    <h1><span>Добавление ученика</span></h1>
-                    <div class="pupils-list">
-                        <div
-                            v-for="(pupil, pupilId) in $store.state.pupilsModule.choosedClassPupilList"
-                            class="pupil-div"
-                            :key="pupilId"
-                            @click="choosePupil(pupil.login)"
-                        >
-                            <img
-                                src="../../assets/checkbox-icon-active.png"
-                                v-if="pupil.isChoosed"
-                            >
-                            <img
-                                src="../../assets/checkbox-icon.png"
-                                v-if="!pupil.isChoosed"
-                            >
-                            <span>{{pupil.login}}</span>
+                    <h1><span>Удаление учеников {{$store.state.pupilsModule.choosedParallelNumber}}-{{$store.state.pupilsModule.choosedClassLetter}}</span></h1>
+                    <div v-if="$store.state.pupilsModule.errorMessage" class="error-message-container">
+                        <span>{{$store.state.pupilsModule.errorMessage}}</span>
+                        <div class="buttons-container">
+                            <button @click="$emit('close')" class="exit-button">Закрыть</button>
                         </div>
                     </div>
-                    <div class="buttons-container">
-                        <button @click="approvePupilListChanges">Удалить из школы</button>
-                        <button @click="$emit('close')" class="exit-button">Закрыть</button>
+                    <div v-if="!$store.state.pupilsModule.errorMessage">
+                        <div class="pupils-list">
+                            <div
+                                v-for="(pupil, pupilId) in $store.state.pupilsModule.choosedClassPupilList"
+                                class="pupil-div"
+                                :key="pupilId"
+                                @click="choosePupil(pupil.login)"
+                            >
+                                <img
+                                    src="../../../assets/checkbox-icon-active.png"
+                                    v-if="pupil.isChoosed"
+                                >
+                                <img
+                                    src="../../../assets/checkbox-icon.png"
+                                    v-if="!pupil.isChoosed"
+                                >
+                                <span>{{pupil.login}}</span>
+                            </div>
+                        </div>
+                        <div class="buttons-container">
+                            <button @click="approvePupilListChanges">Удалить из школы</button>
+                            <button @click="$emit('close')" class="exit-button">Закрыть</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -41,25 +49,12 @@ export default {
             userInput: '',
         }
     },
+    beforeDestroy() {
+        this.$store.commit('CLEAR_TEMP_VARIABLES');
+    },
     methods: {
         preventBubling(e) {
             e.stopPropagation();
-        },
-        verifyUserInput() {
-            if (!(this.userInput.trim() == '')) {
-                // here should be verification of user input
-                // specifically if login can be added and etc...
-                this.$emit('close');
-            } else {
-                this.showErrorMessage('Логин не может быть пустой строкой');
-            }
-        },
-        showErrorMessage(errorMessage) {
-            this.errorMessage = errorMessage;
-
-            setTimeout(() => {
-                this.hideErrorMessage();
-            }, 4000);
         },
         hideErrorMessage() {
             this.errorMessage = '';
@@ -68,8 +63,10 @@ export default {
             this.$store.commit('CHOOSE_PUPIL_TO_DELETE', pupilLogin);
         },
         approvePupilListChanges() {
-            this.$store.commit('APPROVE_PUPIL_LIST_CHANGES');
-            this.$emit('close');
+            this.$store.dispatch('approvePupilListChanges')
+                .then(() => {
+                    this.$emit(this.$store.state.pupilsModule.emittedEvent);
+                });
         },
     }
 }
@@ -174,6 +171,17 @@ export default {
 
 .buttons-container > button:hover {
     background-color: #ff8d00;
+}
+
+.error-message-container {
+    text-align: center;
+    color: red;
+    display: flex;
+    flex-direction: column;
+}
+
+.error-message-container > .buttons-container {
+    margin-bottom: 0px;
 }
 
 @media (max-width: 850px) {

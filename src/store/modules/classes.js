@@ -124,24 +124,28 @@ const mutations = {
 
 const actions = {
     getParallelsList({ commit }) {
-        HTTP.get('getparallels', {
-            validateStatus(status) {
-                // 403 status code means that user is not authoraized.then(redirect user to login form)
-                if (status === 403) {
-                    const urlToRedirect = 'http://192.168.1.39:8090/teacher/schoolsettings';
-                    window.location.replace(urlToRedirect);
-                }
-                return true;
-            },
-        })
-            .then((response) => {
-                console.log(response);
-                commit('SET_PARALLELS_LIST', response.data.parallels);
+        return new Promise((resolve) => {
+            HTTP.get('getparallels', {
+                validateStatus(status) {
+                    // 403 status code means that user is not authoraized.then(redirect user to login form)
+                    if (status === 403) {
+                        const urlToRedirect = 'http://192.168.1.39:8090/teacher/schoolsettings';
+                        window.location.replace(urlToRedirect);
+                    }
+                    return true;
+                },
             })
-            .catch((error) => {
-                console.log(error);
-                console.log(error.response);
-            });
+                .then((response) => {
+                    console.log(response);
+                    commit('SET_PARALLELS_LIST', response.data.parallels);
+                    resolve();
+                })
+                .catch((error) => {
+                    console.log(error);
+                    console.log(error.response);
+                    resolve();
+                });
+        });
     },
     addParallel({ commit, state }, parallelToAddNumber) {
         let newParallelsList = JSON.parse(JSON.stringify(state.parallels));

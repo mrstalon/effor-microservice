@@ -1,5 +1,5 @@
 <template>
-    <div class="pupils-container">
+    <div class="pupils-container" v-if="loaded">
         <register-and-add-pupils
             v-if="isRegisterAndAddStudentShown"
             @close="isRegisterAndAddStudentShown = false"
@@ -33,29 +33,29 @@
                 <div class="class-header">
                     <h1>{{$store.state.pupilsModule.choosedParallelNumber}}-{{classObj.letter}}</h1>
                     <div class="edit-buttons-container" v-if="!isStudentListEmpty(classObj.letter)" >
-                        <button class="add-pupils-alone-button" @click="showAddPupilMenu()" title="Добавить учеников по логину">
-                            <img src="../assets/add-pupils-icon.png">
+                        <button class="add-pupils-alone-button" @click="showAddPupilMenu(classObj)" title="Добавить учеников по логину">
+                            <img src="../../assets/add-pupils-icon.png">
                             <span>Добавить</span>
                         </button>
                     </div>
                     <div class="edit-buttons-container" v-if="isStudentListEmpty(classObj.letter)">
-                        <button class="about-pupils-button" @click="showClassReportsMenu(classObj.letter)" title="Отчёты по проверочным работам">
-                            <img src="../assets/pupils-info-icon.png" class="pupils-info-img">
+                        <button class="about-pupils-button" @click="showClassReportsMenu(classObj)" title="Отчёты по проверочным работам">
+                            <img src="../../assets/pupils-info-icon.png" class="pupils-info-img">
                             <span>Отчёты</span>
                         </button>
 
-                        <button class="add-pupils-button" @click="showAddPupilMenu()" title="Добавить учеников по логину">
-                            <img src="../assets/add-pupils-icon.png">
+                        <button class="add-pupils-button" @click="showAddPupilMenu(classObj)" title="Добавить учеников по логину">
+                            <img src="../../assets/add-pupils-icon.png">
                             <span>Добавить</span>
                         </button>
 
                         <button class="print-pupils-button" title="Распечатать информацию о классе">
-                            <img src="../assets/print-pupils-icon.png">
+                            <img src="../../assets/print-pupils-icon.png">
                             <span>Печать</span>
                         </button>
 
-                        <button class="remove-pupils-button" @click="showDeletePupilsMenu(classObj.letter)" title="Удалить учеников из школы">
-                            <img src="../assets/remove-pupils-icon.png">
+                        <button class="remove-pupils-button" @click="showDeletePupilsMenu(classObj)" title="Удалить учеников из школы">
+                            <img src="../../assets/remove-pupils-icon.png">
                             <span>Удалить</span>
                         </button>
                     </div>
@@ -77,11 +77,11 @@
 
 
 <script>
-import ChooseParallel from '../components/pupils-components/ChooseParallel.vue';
-import RegisterAndAddPupils from '../components/pupils-components/RegisterAndAddPupils.vue';
-import ClassReportsMenu from '../components/pupils-components/ClassReportsMenu.vue';
-import AddPupilMenu from '../components/pupils-components/AddPupilMenu.vue';
-import DeletePupilsMenu from '../components/pupils-components/DeletePupilsMenu.vue';
+import ChooseParallel from '../../components/school/pupils-components/ChooseParallel.vue';
+import RegisterAndAddPupils from '../../components/school/pupils-components/RegisterAndAddPupils.vue';
+import ClassReportsMenu from '../../components/school/pupils-components/ClassReportsMenu.vue';
+import AddPupilMenu from '../../components/school/pupils-components/AddPupilMenu.vue';
+import DeletePupilsMenu from '../../components/school/pupils-components/DeletePupilsMenu.vue';
 
 export default {
     components: {
@@ -92,7 +92,12 @@ export default {
         DeletePupilsMenu,
     },
     beforeMount() {
-        this.$store.dispatch('getParallelsList');
+        // this.$store.dispatch('getParallelsList')
+        //     .then(() => {
+        //         this.loaded = true;
+        //         this.$store.commit('INITIALIZE_CREATED_PARALLELS_NUMBERS');
+        //     });
+        this.$store.commit('INITIALIZE_CREATED_PARALLELS_NUMBERS');
     },
     data() {
         return {
@@ -101,6 +106,7 @@ export default {
             isReportsMenuShown: false,
             isAddPupilShown: false,
             isDeletePupilsMenu: false,
+            loaded: false,
         }
     },
     methods: {
@@ -119,16 +125,16 @@ export default {
             }
             return true;
         },
-        showClassReportsMenu(newClassLetter) {
-            console.log('clickclack');
-            this.$store.commit('CHANGE_CHOOSED_CLASS', newClassLetter);
+        showClassReportsMenu(newClassObj) {
+            this.$store.commit('CHANGE_CHOOSED_CLASS', newClassObj);
             this.isReportsMenuShown = true;
         },
-        showAddPupilMenu() {
+        showAddPupilMenu(newClassObj) {
+            this.$store.commit('CHANGE_CHOOSED_CLASS', newClassObj);
             this.isAddPupilShown = true;
         },
-        showDeletePupilsMenu(newClassLetter) {
-            this.$store.commit('CHANGE_CHOOSED_CLASS', newClassLetter);
+        showDeletePupilsMenu(newClassObj) {
+            this.$store.commit('CHANGE_CHOOSED_CLASS', newClassObj);
             this.isDeletePupilsMenu = true;
         },
     },
