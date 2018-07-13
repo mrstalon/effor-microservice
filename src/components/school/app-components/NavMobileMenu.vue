@@ -7,7 +7,7 @@
             </div>
             <span>Профиль</span>
         </a>
-        <a :href="makeFullHref('teacher/schoolsetting')">
+        <a :href="makeFullHref('teacher/schoolsetting')" v-if="$store.state.appModule.role === 'header'">
             <div>
                 <img src="../../../assets/school-monitoring-icon-white.png" alt="Could not load an image">
             </div>
