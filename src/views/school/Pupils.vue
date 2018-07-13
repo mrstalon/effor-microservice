@@ -18,8 +18,12 @@
             @close="isAddPupilShown = false"
         />
         <delete-pupils-menu
-            v-if="isDeletePupilsMenu"
-            @close="isDeletePupilsMenu = false"
+            v-if="isDeletePupilsMenuShown"
+            @close="isDeletePupilsMenuShown = false"
+        />
+        <pupil-reports-menu
+            v-if="isPupilReportsMenuShown"
+            @close="isPupilReportsMenuShown = false"
         />
         <div class="buttons-container">
             <button @click="showChooseParallelWindow">{{$store.state.pupilsModule.choosedParallelNumber}} классы</button>
@@ -65,7 +69,7 @@
                         v-for="(pupil, pupilId) in classObj.pupils"
                         :key="pupilId"
                     >
-                        <span>
+                        <span @click="showPupilReportsMenu(pupil.login)">
                             {{pupil.login}}
                         </span>
                     </div>
@@ -77,11 +81,12 @@
 
 
 <script>
-import ChooseParallel from '../../components/school/pupils-components/ChooseParallel.vue';
-import RegisterAndAddPupils from '../../components/school/pupils-components/RegisterAndAddPupils.vue';
-import ClassReportsMenu from '../../components/school/pupils-components/ClassReportsMenu.vue';
-import AddPupilMenu from '../../components/school/pupils-components/AddPupilMenu.vue';
-import DeletePupilsMenu from '../../components/school/pupils-components/DeletePupilsMenu.vue';
+import ChooseParallel from '../../components/school/pupils-components/ChooseParallel';
+import RegisterAndAddPupils from '../../components/school/pupils-components/RegisterAndAddPupils';
+import ClassReportsMenu from '../../components/school/pupils-components/ClassReportsMenu';
+import AddPupilMenu from '../../components/school/pupils-components/AddPupilMenu';
+import DeletePupilsMenu from '../../components/school/pupils-components/DeletePupilsMenu';
+import PupilReportsMenu from '../../components/school/pupils-components/PupilReportsMenu';
 
 export default {
     components: {
@@ -90,13 +95,14 @@ export default {
         ClassReportsMenu,
         AddPupilMenu,
         DeletePupilsMenu,
+        PupilReportsMenu,
     },
     beforeMount() {
-        // this.$store.dispatch('getParallelsList')
-        //     .then(() => {
-        //         this.loaded = true;
-        //         this.$store.commit('INITIALIZE_CREATED_PARALLELS_NUMBERS');
-        //     });
+        this.$store.dispatch('getParallelsList')
+            .then(() => {
+                this.loaded = true;
+                this.$store.commit('INITIALIZE_CREATED_PARALLELS_NUMBERS');
+            });
         this.$store.commit('INITIALIZE_CREATED_PARALLELS_NUMBERS');
     },
     data() {
@@ -105,7 +111,8 @@ export default {
             isRegisterAndAddStudentShown: false,
             isReportsMenuShown: false,
             isAddPupilShown: false,
-            isDeletePupilsMenu: false,
+            isDeletePupilsMenuShown: false,
+            isPupilReportsMenuShown: false,
             loaded: false,
         }
     },
@@ -136,6 +143,10 @@ export default {
         showDeletePupilsMenu(newClassObj) {
             this.$store.commit('CHANGE_CHOOSED_CLASS', newClassObj);
             this.isDeletePupilsMenu = true;
+        },
+        showPupilReportsMenu(pupilLogin) {
+            this.$store.commit('CHANGE_CHOOSED_PUPIL_NAME', pupilLogin);
+            this.isPupilReportsMenuShown = true;
         },
     },
 }

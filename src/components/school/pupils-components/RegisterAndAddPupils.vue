@@ -3,7 +3,7 @@
         <div class="modal-mask" >
             <div class="modal-wrapper">
                 <div @click="preventBubling">
-                    <div class="modal-container" v-if="!$store.state.pupilsModule.errorMessage">
+                    <div class="modal-container" v-if="!$store.state.pupilsModule.errorMessage && !$store.state.pupilsModule.arePupilsRegistered">
                         <h1><span>Добавление новых учеников</span></h1>
                         <div class="choose-checkboxes-container">
                             <span>Выберите класс: </span>
@@ -41,6 +41,32 @@
                             <button @click="$emit('close')">Закрыть</button>
                         </div>
                     </div>
+                    <div class="modal-container modal-container-reg" v-if="$store.state.pupilsModule.arePupilsRegistered">
+                        <h1><span>Добавление новых учеников</span></h1>
+                        <span class="success-reg">Регистрация прошла успешно!</span>
+                        <table class="classes-info-table">
+                            <tr class="classes-info-table-header">
+                                <td>Ученик</td>
+                                <td>Логин</td>
+                                <td class="add-class-button">Пароль</td>
+                            </tr>
+                            <tr
+                                v-for="(pupil, pupilId) in $store.state.pupilsModule.registeredPupilsInfo"
+                                :key="pupilId"
+                            >
+                                <td class="parallel-number-cell">{{pupil.firstName}} {{pupil.lastName}}</td>
+                                <td class="classes-list-cell">
+                                    <span>
+                                        {{pupil.login}}
+                                    </span>
+                                </td>
+                                <td class="add-class-button">
+                                    {{pupil.password}}
+                                </td>
+                            </tr>
+                        </table>
+                        <button @click="$emit('close')" class="exit-button">Закрыть</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -53,6 +79,9 @@ import alphabet from '../../../response-mocks/alphabet';
 import findLetterPosition from '../../../helpers/find-letter-position';
 
 export default {
+    beforeDestroy() {
+        this.$store.commit('CLEAR_TEMP_VARIABLES');
+    },
     data() {
         return {
             choosedParallelNumber: 1,
@@ -82,10 +111,7 @@ export default {
             }
 
             this.$store.commit('CHANGE_LETTER_POSITION', findLetterPosition(alphabet, this.choosedClassLetter));
-            this.$store.dispatch('sendNewPupilsLogins', this.userInput.split(' '))
-                .then(() => {
-                    this.$emit(this.$store.state.pupilsModule.emittedEvent);
-                });
+            this.$store.dispatch('sendNewPupilsLogins', this.devideStringToLinesAndClearThem());
         },
         validateSelectData() {
             if (this.choosedParallelNumber && this.choosedClassLetter) {
@@ -103,12 +129,9 @@ export default {
         validateLinesData() {
             let boolToReturn = true;
             let lines = this.devideStringToLinesAndClearThem();
-            console.log(lines);
-            console.log(lines);
             this.lines = lines;
             lines.forEach((line, index) => {
                 const lineNumber = index + 1;
-                console.log(line)
                 if (line.length < 2) {
                     this.showErrorMessage('Поле ввода должно содержать имя и фамилию ученика, разделённые пробелом', '(Ошибка в строке ' + lineNumber + ')');
                     this.lines = [];
@@ -126,7 +149,7 @@ export default {
         devideStringToLinesAndClearThem() {
             let lines = this.userInput.split(/\r?\n/);
             lines = lines.map((line) => {
-                let words = line.str.match(/[а-яА-Яa-zA-Z]+/g);
+                let words = line.match(/[а-яА-Яa-zA-Z]+/g);
                 if (words.length < 2) {
                     return words;
                 }
@@ -179,6 +202,10 @@ export default {
     box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
     transition: all .3s ease;
     font-family: 'Open Sans', sans-serif;
+}
+
+.modal-container-reg {
+    min-height: 160px;
 }
 
 .modal-container > h1 {
@@ -279,6 +306,78 @@ textarea {
     min-height: 270px;
     display: flex;
     flex-direction: column;
+}
+
+.classes-info-table {
+    width: 95%;
+    margin: 0 auto;
+    height: fit-content;
+    border: 1px black solid;
+    border-collapse: collapse;
+    color: #333;
+    font-size: 15px;
+}
+
+.classes-info-table-header {
+    font-weight: bold;
+}
+
+.classes-info-table-header > :first-child {
+    width: 90px;
+}
+
+.classes-info-table > tr {
+    margin: 0;
+    padding: 0;
+    height: 10px;
+}
+
+.classes-info-table > tr > td {
+    padding: 3px 5px;
+    word-break: break-all;
+}
+
+th, td {
+    border: 1px solid black;
+}
+
+.parallel-number-cell {
+    width: 140px;
+    text-align: center;
+}
+
+.classes-list-cell > span {
+    margin: 0px;
+    margin-left: 5px;
+}
+
+.success-reg {
+    color: black;
+    margin: 10px auto;
+}
+
+.exit-button {
+    padding: 3px 15px;
+    border: 0;
+    background-color: #898887;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 100%;
+    margin-top: 0px;
+    -webkit-transition: all 0.5s ease;
+    -moz-transition: all 0.5s ease;
+    -o-transition: all 0.5s ease;
+    transition: all 0.5s ease;
+    font-family: 'Open Sans', sans-serif;
+    width: 80%;
+    margin-left: 15%;
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.exit-button:hover {
+    background-color: #ff8d00;
 }
 
 @media (max-width: 850px) {

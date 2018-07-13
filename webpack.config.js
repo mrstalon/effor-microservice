@@ -58,7 +58,7 @@ module.exports = {
         noInfo: true,
         overlay: true,
         disableHostCheck: true,
-        host: '192.168.1.38',
+        host: '192.168.1.49',
         port: 8080,
         headers: {
             'Access-Control-Allow-Origin': 'http://192.168.0.105:8080',

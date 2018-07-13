@@ -1,9 +1,9 @@
-import HTTP from '../../http-config';
+import HTTP from '../../../http-config';
 
-import findLetterPosition from '../../helpers/find-letter-position';
-import sortFunctions from '../../helpers/quick-sorts';
+import findLetterPosition from '../../../helpers/find-letter-position';
+import sortFunctions from '../../../helpers/quick-sorts';
 
-import alphabet from '../../response-mocks/alphabet';
+import alphabet from '../../../response-mocks/alphabet';
 
 const { quickTeacherClassesSort } = sortFunctions;
 
@@ -183,23 +183,12 @@ const mutations = {
 
 const actions = {
     getTeachersList({ commit }) {
-        HTTP.get('getteachers', {
-            validateStatus(status) {
-                // 403 status code means that user is not authoraized.then(redirect user to login form)
-                if (status === 403) {
-                    const urlToRedirect = 'http://192.168.1.39:8090/teacher/schoolsettings';
-                    window.location.replace(urlToRedirect);
-                }
-                return true;
-            },
-        })
+        HTTP.get('getteachers')
             .then((response) => {
-                console.log(response.data);
                 commit('SET_TEACHERS_LIST', response.data.teachers);
             })
             .catch((error) => {
-                // commit('SHOW_OR_HIDE_ERROR_MESSAGE', error.response.data.description);
-                commit('SHOW_OR_HIDE_ERROR_MESSAGE', 'Произошла ошибка при отправке запроса');
+                commit('SHOW_OR_HIDE_ERROR_MESSAGE', error.response.data.description);
                 setTimeout(() => {
                     // hide error message in 4 seconds
                     commit('SHOW_OR_HIDE_ERROR_MESSAGE', '');
@@ -215,19 +204,8 @@ const actions = {
         };
         newTeachersList.splice(tempTeacher.id, 1, newTeacher);
 
-        console.log(newTeacher);
-
         return new Promise((resolve) => {
-            HTTP.put('approveteacherchanges', { teacher: newTeacher }, {
-                validateStatus(status) {
-                    // 403 status code means that user is not authoraized.then(redirect user to login form)
-                    if (status === 403) {
-                        const urlToRedirect = 'http://192.168.1.39:8090/teacher/schoolsettings';
-                        window.location.replace(urlToRedirect);
-                    }
-                    return true;
-                },
-            })
+            HTTP.put('approveteacherchanges', { teacher: newTeacher })
                 .then(() => {
                     commit('APPROVE_TEACHER_CHANGES', newTeachersList);
                     commit('CHANGE_EMITTED_EVENT', 'close');
@@ -235,6 +213,7 @@ const actions = {
                 })
                 .catch((error) => {
                     // commit('SHOW_OR_HIDE_ERROR_MESSAGE', error.response.data.description);
+                    console.log(error);
                     commit('SHOW_OR_HIDE_ERROR_MESSAGE', 'Произошла ошибка при отправке запроса');
                     setTimeout(() => {
                         // hide error message in 4 seconds
@@ -256,23 +235,14 @@ const actions = {
             };
         });
 
-        console.log(teacherDataBaseId);
-        HTTP.put('deleteteacher', { teacherId: teacherDataBaseId }, {
-            validateStatus(status) {
-                // 403 status code means that user is not authoraized.then(redirect user to login form)
-                if (status === 403) {
-                    const urlToRedirect = 'http://192.168.1.39:8090/teacher/schoolsettings';
-                    window.location.replace(urlToRedirect);
-                }
-                return true;
-            },
-        })
+        HTTP.put('deleteteacher', { teacherId: teacherDataBaseId })
             .then(() => {
                 commit('REMOVE_TEACHER', newTeachersList);
                 commit('SHOW_OR_HIDE_ERROR_MESSAGE', '');
             })
             .catch((error) => {
                 // commit('SHOW_OR_HIDE_ERROR_MESSAGE', error.response.data.description);
+                console.log(error);
                 commit('SHOW_OR_HIDE_ERROR_MESSAGE', 'Произошла ошибка при отправке запроса');
                 setTimeout(() => {
                     // hide error message in 4 seconds

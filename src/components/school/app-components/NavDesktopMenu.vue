@@ -1,48 +1,48 @@
 <template>
     <div class="nav-container-desktop" @click="preventBubling">
-        <a href="">
+        <a :href="makeFullHref('teacher/useredit')">
             <div>
                 <img src="../../../assets/profile-icon.png" alt="Could not load an image">
             </div>
             <span>Профиль</span>
         </a>
-        <a href="http://192.168.1.38:8080/school">
+        <a :href="makeFullHref('teacher/schoolsetting')">
             <div>
                 <img src="../../../assets/school-monitoring-icon.png" alt="Could not load an image">
             </div>
             <span>Школа</span>
         </a>
-        <a href="">
+        <a :href="makeFullHref('teacher/controlwork')">
             <div>
                 <img src="../../../assets/school-monitoring-icon.png" alt="Could not load an image">
             </div>
             <span>Мониторинг</span>
         </a>
-        <a href="">
+        <a :href="makeFullHref('teacher/cabinetteacherpupil')">
             <div>
                 <img src="../../../assets/pupils-icon.png" alt="Could not load an image">
             </div>
             <span>Ученики</span>
         </a>
-        <a href="http://192.168.1.38:8080/materials">
+        <a :href="makeFullHref('teacher/cabinetteachermaterial')">
             <div>
                 <img src="../../../assets/materials-icon.png" alt="Could not load an image">
             </div>
             <span>Материалы</span>
         </a>
-        <a href="">
+        <a :href="makeFullHref('teacher/license')">
             <div>
                 <img src="../../../assets/license-icon.png" alt="Could not load an image">
             </div>
             <span>Лицензия</span>
         </a>
-        <a href="">
+        <a :href="makeFullHref('teacher/totourney')">
             <div>
                 <img src="../../../assets/tournament-icon.png" alt="Could not load an image">
             </div>
             <span>Турниры</span>
         </a>
-        <a href="">
+        <a :href="url">
             <div>
                 <img src="../../../assets/logout-icon.png" alt="Could not load an image">
         </div>
@@ -53,12 +53,22 @@
 
 
 <script>
+import HTTPconfig from '../../../http-config/redirect-config';
+
 export default {
     methods: {
         preventBubling(e) {
             e.stopPropagation();
         },
-    }
+        makeFullHref(href) {
+            return this.url + '/' + href;
+        },
+    },
+    data() {
+        return {
+            url: HTTPconfig.url,
+        };
+    },
 }
 </script>
 

@@ -1,6 +1,5 @@
-import HTTP from '../../http-config';
+import HTTP from '../../../http-config';
 
-import parallels from '../../response-mocks/parallels';
 
 const SET_PARALLELS_LIST = 'SET_PARALLELS_LIST';
 const CHOOSE_PARALLEL_TO_RENDER = 'CHOOSE_PARALLEL_TO_RENDER';
@@ -12,21 +11,29 @@ const CHANGE_EMITTED_EVENT = 'CHANGE_EMITTED_EVENT';
 const ADD_USER_BY_LOGIN = 'ADD_USER_BY_LOGIN';
 const CLEAR_TEMP_VARIABLES = 'CLEAR_TEMP_VARIABLES';
 const CHANGE_LETTER_POSITION = 'CHANGE_LETTER_POSITION';
+const CHANGE_ARE_PUPILS_REGISTERED = 'CHANGE_ARE_PUPILS_REGISTERED';
+const SET_REGISTERED_PUPILS_INFO = 'SET_REGISTERED_PUPILS_INFO';
+const SHOW_OR_HIDE_NESTED_ELEMENTS = 'SHOW_OR_HIDE_NESTED_ELEMENTS';
+const SET_REPORTS_ARRAY = 'SET_REPORTS_ARRAY';
+const CHANGE_CHOOSED_PUPIL_NAME = 'CHANGE_CHOOSED_PUPIL_NAME';
 
 
 const state = {
-    // parallels: [],
-    parallels,
+    parallels: [],
     choosedParallelId: 0,
     choosedParallelNumber: 1,
     choosedClassLetter: null,
     choosedClassLetterPosition: null,
     choosedClassId: null,
     choosedClassPupilList: [],
+    choosedPupilLogin: null,
     tempPupilList: [],
     pupilsToDeleteList: [],
     errorMessage: '',
     emittedEvent: '',
+    arePupilsRegistered: false,
+    registeredPupilsInfo: [],
+    reportsArray: [],
 };
 
 const mutations = {
@@ -53,7 +60,6 @@ const mutations = {
         state.tempPupilList = JSON.parse(JSON.stringify(newPupilList));
         state.choosedClassId = newClassId;
         state.choosedClassLetter = newClassObj.letter;
-        console.log(newClassObj);
         state.choosedClassLetterPosition = newClassObj.letterPosition;
     },
     [CHOOSE_PUPIL_TO_DELETE](state, pupilLogin) {
@@ -82,7 +88,6 @@ const mutations = {
             state.pupilsToDeleteList.push({ login: pupilLogin });
         }
 
-        console.log(state.pupilsToDeleteList);
         changedPupilList[pupilId].isChoosed = !changedPupilList[pupilId].isChoosed;
         state.choosedClassPupilList = changedPupilList;
     },
@@ -102,9 +107,33 @@ const mutations = {
     },
     [CLEAR_TEMP_VARIABLES](state) {
         state.pupilsToDeleteList = [];
+        state.reportsArray = [];
+        state.registeredPupilsInfo = [];
     },
     [CHANGE_LETTER_POSITION](state, newLetterPosition) {
         state.choosedClassLetterPosition = newLetterPosition;
+
+        state.choosedClassId = state.parallels[state.choosedParallelId].classes.findIndex((classObj) => {
+            return classObj.letterPosition === state.choosedClassLetterPosition;
+        });
+    },
+    [CHANGE_ARE_PUPILS_REGISTERED](state) {
+        state.arePupilsRegistered = !state.arePupilsRegistered;
+    },
+    [SET_REGISTERED_PUPILS_INFO](state, newPupilsArray) {
+        state.registeredPupilsInfo = newPupilsArray;
+    },
+    [SHOW_OR_HIDE_NESTED_ELEMENTS](state, teacherId) {
+        if (typeof teacherId === 'object') {
+            return;
+        }
+        state.reportsArray[teacherId].isOpened = !state.reportsArray[teacherId].isOpened;
+    },
+    [SET_REPORTS_ARRAY](state, newArray) {
+        state.reportsArray = newArray;
+    },
+    [CHANGE_CHOOSED_PUPIL_NAME](state, pupilLogin) {
+        state.choosedPupilLogin = pupilLogin;
     },
 };
 
@@ -115,25 +144,15 @@ const actions = {
             return classObj.letter === state.choosedClassLetter;
         });
         newParallelsList[state.choosedParallelId].classes[classId].pupils = state.tempPupilList;
-        console.log(state.pupilsToDeleteList);
 
         return new Promise((resolve) => {
-            HTTP.put('removepupils', { pupils: state.pupilsToDeleteList }, {
-                validateStatus(status) {
-                    // 403 status code means that user is not authoraized.then(redirect user to login form)
-                    if (status === 403) {
-                        const urlToRedirect = 'http://192.168.1.39:8090/teacher/schoolsettings';
-                        window.location.replace(urlToRedirect);
-                    }
-                    return true;
-                },
-            })
+            HTTP.put('removepupils', { pupils: state.pupilsToDeleteList })
                 .then(() => {
                     commit('APPROVE_PUPIL_LIST_CHANGES', newParallelsList);
                     commit('CHANGE_EMITTED_EVENT', 'close');
                     resolve();
                 })
-                .catch((error) => {
+                .catch(() => {
                     // commit('SHOW_OR_HIDE_ERROR_MESSAGE', error.response.data.description);
                     commit('SHOW_OR_HIDE_ERROR_MESSAGE', 'Произошла ошибка при отправке запроса');
                     setTimeout(() => {
@@ -150,22 +169,10 @@ const actions = {
             letterPosition: state.choosedClassLetterPosition,
         };
 
-        console.log(pupilToAdd);
-
         return new Promise((resolve) => {
-            HTTP.put('addpupillogin', pupilToAdd, {
-                validateStatus(status) {
-                    // 403 status code means that user is not authoraized.then(redirect user to login form)
-                    if (status === 403) {
-                        const urlToRedirect = 'http://192.168.1.39:8090/teacher/schoolsettings';
-                        window.location.replace(urlToRedirect);
-                    }
-                    return true;
-                },
-            })
+            HTTP.put('addpupillogin', pupilToAdd)
                 .then((response) => {
-                    // here we need check what response came
-                    console.log(response);
+                    // here we need check which response came
                     if (response.status !== 200) {
                         commit('SHOW_OR_HIDE_ERROR_MESSAGE', response.data.description);
                         commit('CHANGE_EMITTED_EVENT', '');
@@ -191,37 +198,32 @@ const actions = {
         });
     },
     sendNewPupilsLogins({ commit, state }, pupilsToAddArray) {
-        // const arrayOfUsersToSend = pupilsToAddArray.map((user) => {
-        //     return {
-        //         firstName: user[0],
-        //         lastName: user[1],
-        //     };
-        // });
-        console.log(pupilsToAddArray);
-        const arrayOfUsersToSend = [{ firstName: pupilsToAddArray[0], lastName: pupilsToAddArray[1]} ];
+        const arrayOfUsersToSend = pupilsToAddArray.map((user) => {
+            return {
+                firstName: user[0],
+                lastName: user[1],
+            };
+        });
 
         return new Promise((resolve) => {
-            HTTP.post('createnewpupils', { pupils: arrayOfUsersToSend, parNumber: state.choosedParallelNumber, letterPosition: state.choosedClassLetterPosition }, {
-                validateStatus(status) {
-                    // 403 status code means that user is not authoraized.then(redirect user to login form)
-                    if (status === 403) {
-                        const urlToRedirect = 'https://temp1.effor.by/teacher/schoolsettings';
-                        window.location.replace(urlToRedirect);
-                    }
-                    return true;
-                },
+            HTTP.post('createnewpupils', {
+                pupils: arrayOfUsersToSend,
+                parNumber: state.choosedParallelNumber,
+                letterPosition: state.choosedClassLetterPosition,
             })
                 .then((response) => {
-                    console.log(response);
-                    response.data.pupils.forEach((pupil) => {
-                        commit('ADD_PUPIL_BY_LOGIN', { login: pupil.login });
+                    commit('SET_REGISTERED_PUPILS_INFO', response.data);
+                    response.data.forEach((pupil) => {
+                        commit('ADD_USER_BY_LOGIN', pupil.login);
                     });
-                    commit('CHANGE_EMITTED_EVENT', 'close');
+                    commit('CHANGE_EMITTED_EVENT', '');
                     commit('SHOW_OR_HIDE_ERROR_MESSAGE', '');
+                    commit('CHANGE_ARE_PUPILS_REGISTERED');
                     resolve();
                 })
                 .catch((error) => {
-                    commit('SHOW_OR_HIDE_ERROR_MESSAGE', error.response.data.description);
+                    console.log(error);
+                    // commit('SHOW_OR_HIDE_ERROR_MESSAGE', error.response.data.description);
                     setTimeout(() => {
                         // hide error message in 4 seconds
                         commit('SHOW_OR_HIDE_ERROR_MESSAGE', '');
@@ -229,6 +231,38 @@ const actions = {
                     resolve();
                 });
         });
+    },
+    getClassReports({ commit, state }) {
+        const urlToMakeRequest = 'getcontroltest/parallel/' + state.choosedParallelNumber + '/letterposition/' + state.choosedClassLetterPosition;
+        HTTP.get(urlToMakeRequest)
+            .then((response) => {
+                const reportsArray = response.data.map((teacher) => {
+                    return {
+                        ...teacher,
+                        isOpened: false,
+                    };
+                });
+                commit('SET_REPORTS_ARRAY', reportsArray);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    },
+    getPupilReports({ commit, state }) {
+        const urlToMakeRequest = 'getcontroltest/pupil/' + state.choosedPupilLogin;
+        HTTP.get(urlToMakeRequest)
+            .then((response) => {
+                const reportsArray = response.data.map((teacher) => {
+                    return {
+                        ...teacher,
+                        isOpened: false,
+                    };
+                });
+                commit('SET_REPORTS_ARRAY', reportsArray);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     },
 };
 

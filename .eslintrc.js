@@ -33,6 +33,12 @@ module.exports = {
                 ],
             },
         ],
+        "prefer-destructuring": ["error", {
+            "array": false,
+            "object": true
+          }, {
+            "enforceForRenamedProperties": false
+        }],
         "consistent-return": "off",
         "no-console": "off",
         "vue/html-indent": ["error", 4],

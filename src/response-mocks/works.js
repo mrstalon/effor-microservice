@@ -1,0 +1,105 @@
+const works = [
+    {
+        id: 0,
+        number: 1,
+        works: {
+            'Математика': [
+                {
+                    name: 'НОТ. ПРМ №1. Вычисления в пределах 10',
+                    taskCount: 5,
+                    time: 20,
+                    author: 'Гутникова E.E',
+                    isChoosed: false,
+                    isAdded: false,
+                },
+                {
+                    name: 'НОТ. ПРМ №2. Сложение и вычитание в пределах 20',
+                    taskCount: 5,
+                    time: 20,
+                    author: 'Гутникова E.E',
+                    isChoosed: false,
+                    isAdded: false,
+                },
+                {
+                    name: 'НОТ. ПРМ №3. Задачи',
+                    taskCount: 5,
+                    time: 30,
+                    author: 'Гутникова E.E',
+                    isChoosed: false,
+                    isAdded: false,
+                },
+                {
+                    name: 'НОТ. ПРМ №4. Сравнение чисел до 20',
+                    taskCount: 5,
+                    time: 20,
+                    author: 'Гутникова E.E',
+                    isChoosed: false,
+                    isAdded: false,
+                },
+            ],
+            'Русский язык': [],
+            'Белорусский язык': [],
+            'Информатика': [],
+            'Физика': [],
+            'Химия': [
+                {
+                    name: 'Новая проверочная работа',
+                    taskCount: 5,
+                    time: 20,
+                    author: 'Мансветов И.Г.',
+                    isChoosed: false,
+                    isAdded: false,
+                },
+            ],
+            'Астрономия': [],
+            'Развитие': [],
+        },
+    },
+    {
+        id: 1,
+        number: 4,
+        works: {
+            'Математика': [
+                {
+                    name: 'НОТ. ПРМ № 4. Периметр',
+                    taskCount: 5,
+                    time: 20,
+                    author: 'Гутникова E.E',
+                    isChoosed: false,
+                    isAdded: false,
+                },
+                {
+                    name: 'НОТ. ПРМ № 5. Площадь',
+                    taskCount: 5,
+                    time: 20,
+                    author: 'Гутникова E.E',
+                    isChoosed: false,
+                    isAdded: false,
+                },
+            ],
+            'Русский язык': [],
+            'Белорусский язык': [],
+            'Информатика': [],
+            'Физика': [],
+            'Химия': [],
+            'Астрономия': [],
+            'Развитие': [],
+        },
+    },
+    {
+        id: 2,
+        number: 7,
+        works: {
+            'Математика': [],
+            'Русский язык': [],
+            'Белорусский язык': [],
+            'Информатика': [],
+            'Физика': [],
+            'Химия': [],
+            'Астрономия': [],
+            'Развитие': [],
+        },
+    },
+];
+
+export default works;

@@ -3,10 +3,13 @@ import Vuex from 'vuex';
 import createLogger from 'vuex/dist/logger';
 
 
-import teachersModule from './modules/teachers';
-import classesModule from './modules/classes';
-import appModule from './modules/app';
-import pupilsModule from './modules/pupils';
+import teachersModule from './modules/school/teachers';
+import classesModule from './modules/school/classes';
+import appModule from './modules/school/app';
+import pupilsModule from './modules/school/pupils';
+
+import worksModule from './modules/materials/works';
+import coursesModule from './modules/materials/courses';
 
 Vue.use(Vuex);
 
@@ -17,5 +20,7 @@ export default new Vuex.Store({
         teachersModule,
         classesModule,
         pupilsModule,
+        worksModule,
+        coursesModule,
     },
 });

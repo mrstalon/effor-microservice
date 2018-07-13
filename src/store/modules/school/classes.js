@@ -1,9 +1,9 @@
-import HTTP from '../../http-config';
+import HTTP from '../../../http-config';
 
-import sortFunctions from '../../helpers/quick-sorts';
-import checkDoWeNeedToMakeRequest from '../../helpers/check-should-we-make-request';
+import sortFunctions from '../../../helpers/quick-sorts';
+import checkDoWeNeedToMakeRequest from '../../../helpers/check-should-we-make-request';
 
-import alphabet from '../../response-mocks/alphabet';
+import alphabet from '../../../response-mocks/alphabet';
 
 
 const { quickAlphabetSort, quickParallelsSort, quickSort } = sortFunctions;
@@ -125,24 +125,13 @@ const mutations = {
 const actions = {
     getParallelsList({ commit }) {
         return new Promise((resolve) => {
-            HTTP.get('getparallels', {
-                validateStatus(status) {
-                    // 403 status code means that user is not authoraized.then(redirect user to login form)
-                    if (status === 403) {
-                        const urlToRedirect = 'http://192.168.1.39:8090/teacher/schoolsettings';
-                        window.location.replace(urlToRedirect);
-                    }
-                    return true;
-                },
-            })
+            HTTP.get('getparallels')
                 .then((response) => {
-                    console.log(response);
                     commit('SET_PARALLELS_LIST', response.data.parallels);
                     resolve();
                 })
                 .catch((error) => {
                     console.log(error);
-                    console.log(error.response);
                     resolve();
                 });
         });
@@ -173,16 +162,7 @@ const actions = {
         });
 
         return new Promise((resolve) => {
-            HTTP.put('approveparallelchanges', parallelToAdd, {
-                validateStatus(status) {
-                    // 403 status code means that user is not authoraized.then(redirect user to login form)
-                    if (status === 403) {
-                        const urlToRedirect = 'https://temp1.effor.by/teacher/schoolsettings';
-                        window.location.replace(urlToRedirect);
-                    }
-                    return true;
-                },
-            })
+            HTTP.put('approveparallelchanges', parallelToAdd)
                 .then(() => {
                     commit('ADD_PARALLEL', {
                         parallelToAddNumber,
@@ -213,7 +193,6 @@ const actions = {
         const { parallelId, parallelNumber } = payload;
 
         if (checkDoWeNeedToMakeRequest(state.parallels[parallelId].classes, state.arrayOfLettersToAdd)) {
-            console.log('close');
             commit('CHANGE_EMITTED_EVENT', 'close');
             return;
         }
@@ -239,16 +218,7 @@ const actions = {
         }
 
         return new Promise((resolve) => {
-            HTTP.put('approveparallelchanges', newParallel, {
-                validateStatus(status) {
-                    // 403 status code means that user is not authoraized.then(redirect user to login form)
-                    if (status === 403) {
-                        const urlToRedirect = 'https://temp1.effor.by/teacher/schoolsettings';
-                        window.location.replace(urlToRedirect);
-                    }
-                    return true;
-                },
-            })
+            HTTP.put('approveparallelchanges', newParallel)
                 .then(() => {
                     commit('APPROVE_PARALLEL_CHANGES', newParallelsList);
                     // updating createdParallelsNumbers because parallels array was changed

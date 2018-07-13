@@ -1,43 +1,43 @@
 <template>
     <div class="nav-container-mobile">
         <h1>{{$store.state.appModule.userName}}</h1>
-        <a href="">
+        <a :href="makeFullHref('teacher/useredit')">
             <div>
                 <img src="../../../assets/profile-icon-white.png" alt="Could not load an image">
             </div>
             <span>Профиль</span>
         </a>
-        <a href="http://192.168.1.38:8080/school">
+        <a :href="makeFullHref('teacher/schoolsetting')">
             <div>
                 <img src="../../../assets/school-monitoring-icon-white.png" alt="Could not load an image">
             </div>
             <span>Школа</span>
         </a>
-        <a href="">
+        <a :href="makeFullHref('teacher/controlwork')">
             <div>
                 <img src="../../../assets/school-monitoring-icon-white.png" alt="Could not load an image">
             </div>
             <span>Мониторинг</span>
         </a>
-        <a href="">
+        <a :href="makeFullHref('teacher/cabinetteacherpupil')">
             <div>
                 <img src="../../../assets/pupils-icon-white.png" alt="Could not load an image">
             </div>
             <span>Ученики</span>
         </a>
-        <a href="http://192.168.1.38:8080/materials">
+        <a :href="makeFullHref('teacher/cabinetteachermaterial')">
             <div>
                 <img src="../../../assets/materials-icon-white.png" alt="Could not load an image">
             </div>
             <span>Материалы</span>
         </a>
-        <a href="">
+        <a :href="makeFullHref('teacher/license')">
             <div>
                 <img src="../../../assets/license-icon-white.png" alt="Could not load an image">
             </div>
             <span>Лицензия</span>
         </a>
-        <a href="">
+        <a :href="makeFullHref('teacher/totourney')">
             <div>
                 <img src="../../../assets/tournament-icon-white.png" alt="Could not load an image">
             </div>
@@ -47,7 +47,7 @@
             <i>i</i>
             <span>О платформе</span>
         </a>
-        <a href="">
+        <a :href="url">
             <div>
                 <img src="../../../assets/logout-icon-white.png" alt="Could not load an image">
         </div>
@@ -58,11 +58,12 @@
 
 
 <script>
+import HTTPconfig from '../../../http-config/redirect-config';
 
 export default {
     data() {
         return {
-
+            url: HTTPconfig.url,
         };
     },
     methods: {
@@ -70,7 +71,10 @@ export default {
             this.$emit('showNav');
             e.stopPropagation();
             this.$emit('close');
-        }
+        },
+        makeFullHref(href) {
+            return this.url + '/' + href;
+        },
     }
 }
 

@@ -7,7 +7,7 @@
             </a>
             <div class="user-profile-container">
                 <button class="user-info-button" @click="showNavComponent">
-                  <img src="./assets/avatar_default.png" alt="Could not load an image" class="avatar-logo-img">
+                  <img :src="$store.state.appModule.avatar" alt="Could not load an image" class="avatar-logo-img">
                   <p>{{$store.state.appModule.userName}}</p>
                 </button>
                 <div class="user-info-button-mobile" @click="showMobileNavMenu">
@@ -15,8 +15,16 @@
                     <span></span>
                     <span></span>
                 </div>
-                <nav-desktop-menu v-if="showNavDesktop" class="nav-component-desktop"/>
-                <nav-mobile-menu v-if="showNavMobile" class="nav-component-mobile" @showNav="showAboutMenu = true" @close="showNavMobile = false"/>
+                <nav-desktop-menu
+                    v-if="showNavDesktop"
+                    class="nav-component-desktop"
+                />
+                <nav-mobile-menu
+                    v-if="showNavMobile"
+                    class="nav-component-mobile"
+                    @showNav="showAboutMenu = true"
+                    @close="showNavMobile = false"
+                />
             </div>
         </header>
 
@@ -49,6 +57,9 @@ import NavMobileMenu from './components/school/app-components/NavMobileMenu.vue'
 import axios from 'axios';
 
 export default {
+    beforeMount() {
+        this.$store.dispatch('getUserInfo');
+    },
     components: {
         About,
         NavDesktopMenu,
@@ -100,6 +111,7 @@ export default {
     flex-direction: column;
     font-family: 'Open Sans', sans-serif;
     color: #898887;
+    max-width: 100%;
 }
 
 header, main, footer {

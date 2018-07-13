@@ -1,3 +1,5 @@
 <template>
-    <h1>tasks base</h1>
+    <div>
+        <h1>Маша самая{{upgrade}} крутая</h1>
+    </div>
 </template>

@@ -1,9 +1,18 @@
 <template>
     <div class="main-content-container">
-        <div class="content-nav-container">
+        <div class="content-nav-container" v-if="!$store.state.worksModule.isWorksCatalogMenuShown">
             <router-link :to="{ name: 'works' }"><p>Работы</p></router-link>
             <router-link :to="{ name: 'courses' }"><p>Курсы</p></router-link>
             <router-link :to="{ name: 'tasks-base' }"><p>База заданий</p></router-link>
+        </div>
+        <div v-if="$store.state.worksModule.isWorksCatalogMenuShown" class="catalog-menu-header">
+            <button
+                class="back-button"
+                @click="hideWorksCatalogMenu()"
+            >
+                <img src="../../assets/back-arrow.png">
+            </button>
+            <h1>Каталог проверочных работ</h1>
         </div>
         <router-view />
     </div>
@@ -11,8 +20,13 @@
 
 <script>
 export default {
-    
-}
+    methods: {
+        hideWorksCatalogMenu() {
+            this.$store.commit('CLEAR_TEMP_VARIABLES');
+            this.$store.commit('SHOW_OR_HIDE_CATALOG_MENU');
+        }
+    },
+};
 </script>
 
 
@@ -60,6 +74,38 @@ a.router-link-exact-active {
     background-color:#ff8d00 !important;
 }
 
+.catalog-menu-header {
+    display: flex;
+    flex-direction: row;
+    width: 800px;
+    margin: 0px auto;
+    margin-top: 15px;
+    height: 35px;
+}
+
+.catalog-menu-header > :first-child {
+    width: 40px;
+    cursor: pointer;
+    padding: 1px 0;
+    background-color: #898887;
+    border: 0;
+}
+
+.catalog-menu-header > :last-child {
+    width: 90%;
+    background-color: #ff8d00;
+    margin: 0;
+    color: white;
+    padding: 6px 30px 10px 10px;
+    text-align: left;
+    background-color: #ff8d00;
+    color: White;
+    margin-top: 0px;
+    font-size: 17px;
+    font-weight: 400;
+    margin-left: 0.2%;
+}
+
 @media screen and (max-width: 850px) {
     .main-content-container {
         width: 602px;
@@ -71,6 +117,10 @@ a.router-link-exact-active {
         margin-top: 0;
     }
 
+    .catalog-menu-header {
+        width: 600px;
+        margin-top: 0;
+    }
 }
 
 @media screen and (max-width: 650px) {
@@ -80,6 +130,11 @@ a.router-link-exact-active {
     }
 
     .content-nav-container {
+        max-width: 400px;
+        width: 100%;
+    }
+
+    .catalog-menu-header {
         max-width: 400px;
         width: 100%;
     }
