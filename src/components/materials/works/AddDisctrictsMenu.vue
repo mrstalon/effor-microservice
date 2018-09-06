@@ -3,18 +3,17 @@
         <div class="modal-mask" >
             <div class="modal-wrapper">
                 <div class="modal-container" v-on:click="preventBubling">
-                    <h1><span>Выберите параллель</span></h1>
-                    <div class="parallel-list-container">
-                        <span
-                            v-for="(parallel, parallelId) in $store.state.worksModule.createdParallelNumbers"
-                            :key="parallelId"
-                            :class="[parallel.number === $store.state.worksModule.choosedParallelNumber ? 'parallel-is-choosed' : 'parallel-is-not-choosed']"
-                            @click="chooseParallel(parallel)"
-                         >
-                            {{parallel.number}}
-                        </span>
+                    <h1><span>Добавление районов</span></h1>
+                    <div class="districts-container">
+
                     </div>
-                    <button @click="$emit('close')">Закрыть</button>
+                    <div class="buttons-container">
+                        <div>
+                            <button>Выбрать все</button>
+                            <button>Назначить</button>
+                        </div>
+                        <button>Закрыть</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -28,14 +27,7 @@ export default {
         preventBubling(e) {
             e.stopPropagation();
         },
-        chooseParallel(parallel) {
-            this.$store.commit('CHANGE_CHOOSED_PARALLEL_NUMBER_AND_ID', parallel);
-            this.$store.dispatch('getWorksArray')
-                .then(() => {
-                    this.$emit('close');
-                });
-        },
-    }
+    },
 }
 </script>
 
@@ -61,8 +53,8 @@ export default {
 .modal-container {
     display: flex;
     flex-direction: column;
-    width: 300px;
-    min-height: 250px;
+    width: 450px;
+    min-height: 400px;
     height: fit-content;
     margin: 0px auto;
     padding: 0;
@@ -72,8 +64,21 @@ export default {
     font-family: 'Open Sans', sans-serif;
 }
 
-.modal-container > button {
-    text-align: center;
+.buttons-container {
+    margin: auto;
+    margin-top: 30px;
+    margin-bottom: 10px;
+    width: 200px;
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    margin-left: 70px;
+}
+
+.buttons-container > button, .buttons-container > div > button {
+    padding: 3px 15px;
     border: 0;
     background-color: #898887;
     color: #fff;
@@ -81,17 +86,15 @@ export default {
     cursor: pointer;
     font-size: 100%;
     margin-top: 0px;
+    width: 160px;
     -webkit-transition: all 0.5s ease;
     -moz-transition: all 0.5s ease;
     -o-transition: all 0.5s ease;
     transition: all 0.5s ease;
-    width: 160px;
-    height: 30px;
-    margin-top: 80px;
-    margin-left: 125px;
+    font-family: 'Open Sans', sans-serif;
 }
 
-.modal-container > button:hover {
+.buttons-container > button:hover, .buttons-container > div > button:hover {
     background-color: #ff8d00;
 }
 
@@ -119,48 +122,46 @@ export default {
     font-weight: 400;
 }
 
-.parallel-list-container > span{
-    display: inline-block;
-    width: 33px;
-    height: 25px;
-    margin-top: 5px;
-    text-align: center;
-    cursor: pointer;
-    border-radius: 4px;
-    text-align: center;
-    background: transparent url('../../../assets/zero.png') no-repeat 3px 3px;
-    border: 1px solid white;
-    color: black;
-    margin-right: 4px;
-    margin-left: 4px;
-    padding-top: 6px;
+.districts-container {
+    height: 250px;
+    max-height: 250px;
+    overflow: auto;
 }
 
-.parallel-list-container {
-    margin-left: 10px;
+.buttons-container {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
 }
 
-.parallel-is-choosed {
-    background-color: #ff8d00 !important;
+.buttons-container > :last-child {
+    margin-left: 170px;
 }
 
-.parallel-is-not-choosed {
-    background-color: 0;
+.buttons-container > div {
+    width: 85%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
 }
 
 @media (max-width: 850px) {
     .modal-container {
         width: 632px;
-        min-height: 250px;
+        min-height: 150px;
     }
 
     .parallel-list-container {
         height: 140px;
     }
 
-    .modal-container > button {
-        width: 95%;
-        margin: auto;
+    .buttons-container {
+        width: 100%;
+        margin-left: 0px;
+    }
+
+    .buttons-container > button {
+        width: 90%;
     }
 }
 

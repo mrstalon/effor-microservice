@@ -38,10 +38,10 @@ export default {
     },
     data() {
         return {
-            date: new Date,
             config: {
                 locale: Russian,
-            }
+            },
+            currentDate: null,
         }
     },
     methods: {
@@ -49,15 +49,56 @@ export default {
             e.stopPropagation();
         },
         setDate() {
-            this.$store.commit('SET_WORK_CONDUCTING_DATE', this.computedDate);
-            this.$emit('close');
+            this.$store.dispatch('changeWorkDate', this.computedDate)
+                .then(() => {
+                    this.$emit('close');
+                });
         },
     },
     computed: {
         computedDate() {
-            return this.date.split('-').reverse().join('.');
-        }
-    }
+            if (!(this.date instanceof Date)) {
+                this.date = new Date(this.date);
+            }
+            let dateToReturn = this.date.getFullYear() + '-';
+            let month = +this.date.getMonth() + 1;
+            if (String(month).split('').length === 2) {
+                dateToReturn = dateToReturn + String(month) + '-';
+            } else {
+                month = '0' + month;
+                dateToReturn = dateToReturn + month + '-';
+            }
+            let day = +this.date.getDate();
+            if (String(day).split('').length === 2) {
+                dateToReturn = dateToReturn + String(day);
+            } else {
+                day = '0' + day;
+                dateToReturn = dateToReturn + day;
+            }
+            return dateToReturn;
+        },
+        date: {
+            get () {
+                if (this.currentDate) {
+                    return this.currentDate;
+                }
+                const choosedWorkId = this.$store.state.worksModule.worksArray.findIndex((work) => {
+                    return this.$store.state.worksModule.choosedWork.id === work.id;
+                });
+                if (this.$store.state.worksModule.worksArray[choosedWorkId].dateStart) {
+                    this.currentDate = this.$store.state.worksModule.worksArray[choosedWorkId].dateStart;
+                    return this.currentDate;
+                } else {
+                    this.currentDate = new Date();
+                    return this.currentDate;
+                }
+            },
+            set(newValue) {
+                this.currentDate = newValue;
+                return this.currentDate;
+            },
+        },
+    },
 }
 </script>
 

@@ -10,7 +10,7 @@
                             :key="subjectId"
                             @click="changeChoosedSubject(subject)"
                         >
-                            {{subject}}
+                            {{subject.title}}
                         </button>
                     </div>
                     <button @click="$emit('close')" class="close-button" >Закрыть</button>
@@ -29,7 +29,11 @@ export default {
         },
         changeChoosedSubject(newSubject) {
             this.$store.commit('CHANGE_CHOOSED_SUBJECT', newSubject);
-            this.$emit('close');
+            this.$store.dispatch('getWorksArray')
+                .then(() => {
+                    this.$store.dispatch('getTasksTree');
+                    this.$emit('close');
+                });
         },
     }
 }
