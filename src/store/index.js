@@ -10,6 +10,9 @@ import pupilsModule from './modules/school/pupils';
 
 import worksModule from './modules/materials/works';
 import coursesModule from './modules/materials/courses';
+import taskBaseModule from './modules/materials/task-base';
+
+import profileModule from './modules/profile/profile';
 
 Vue.use(Vuex);
 
@@ -22,5 +25,7 @@ export default new Vuex.Store({
         pupilsModule,
         worksModule,
         coursesModule,
+        taskBaseModule,
+        profileModule,
     },
 });

@@ -1,9 +1,8 @@
 <template>
     <div class="main-content-container">
         <div class="content-nav-container" v-if="!$store.state.worksModule.isWorksCatalogMenuShown">
-            <router-link :to="{ name: 'works' }"><p>Работы</p></router-link>
-            <router-link :to="{ name: 'courses' }"><p>Курсы</p></router-link>
-            <router-link :to="{ name: 'tasks-base' }"><p>База заданий</p></router-link>
+            <router-link :to="{ name: 'externalworks' }"><p>Внешние работы</p></router-link>
+            <router-link :to="{ name: 'reports' }"><p>Отчеты</p></router-link>
         </div>
         <div v-if="$store.state.worksModule.isWorksCatalogMenuShown" class="catalog-menu-header">
             <button
@@ -21,7 +20,7 @@
 <script>
 export default {
     beforeMount() {
-        this.$store.commit('CHANGE_IS_MONITORING', false);
+        this.$store.commit('CHANGE_IS_MONITORING', true);
     },
     methods: {
         hideWorksCatalogMenu() {
@@ -62,7 +61,7 @@ export default {
     color: white;
     display: block;
     background-color: #898887;
-    width: 33.33%;
+    width: 50%;
     height: 33px;
     border: 1px solid white;
     text-decoration: none;

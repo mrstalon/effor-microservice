@@ -11,6 +11,7 @@ module.exports = {
         "es6": true,
     },
     "rules": {
+        "no-loop-func" : "off",
         "max-len": ["error", { "code": 120 }],
         "no-new": "off",
         "global-require": "off",

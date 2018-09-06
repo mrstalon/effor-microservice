@@ -1,63 +1,71 @@
 <template>
-    <div class="courses-container">
+    <div class="courses-container" v-if="isLoaded">
         <subject-menu
             v-if="isSubjectMenuShown"
             @close="isSubjectMenuShown = false"
         />
-        <choose-work-type-menu
-            v-if="isWorkTypeMenuShown"
-            @close="isWorkTypeMenuShown = false"
+        <choose-courses-type-menu
+            v-if="isCoursesTypeMenuShown"
+            @close="isCoursesTypeMenuShown = false"
         />
         <div class="choose-buttons-container">
-            <button  @click="showWorkTypeMenu()">{{$store.state.coursesModule.choosedWorkType}}</button>
+            <button  @click="showCoursesTypeMenu()">{{$store.state.coursesModule.choosedCourseType.title}}</button>
             <span>по предмету</span>
-            <button @click="showSubjectMenu()">{{$store.state.coursesModule.choosedSubject}}</button>
+            <button @click="showSubjectMenu()">{{$store.state.coursesModule.choosedSubject.title}}</button>
         </div>
-        <div class="courses-container">
+        <div class="tasks-tree-container">
             <div
-                v-for="(course, courseId) in $store.state.coursesModule.coursesArray[$store.state.coursesModule.choosedSubject][$store.state.coursesModule.choosedWorkType]"
-                :key="courseId"
+                v-for="(task, taskId) in $store.state.coursesModule.coursesArray"
+                :key="taskId"
                 class="fit-content"
             >
-                <div @click="showOrHideNestedElements(courseId)">
-                    <span v-if="!course.isOpened" class="bold-span">+</span>
-                    <span v-if="course.isOpened" class="bold-span">-</span>
-                    <span class="bold-span">Для {{course.parallelNumber}} классов</span>
+                <div @click="showOrHideNestedElements(taskId)">
+                    <span v-if="!task.isOpened" class="bold-span">+</span>
+                    <span v-if="task.isOpened" class="bold-span">-</span>
+                    <span class="bold-span">{{task.title}}</span>
                 </div>
                 <transition name="slide-fade">
-                    <div v-if="course.isOpened">
+                    <div v-if="task.isOpened">
                         <div
-                            v-for="(subCourse, subCourseId) in course.works"
-                            :key="subCourseId"
+                            v-if="task.courseList.length !== 0"
+                            v-for="(subTask, subTaskId) in task.courseList"
+                            :key="subTaskId"
                             class="one-nested fit-content"
                         >
-                            <div @click="showOrHideNestedElements(courseId, subCourseId)">
-                                <span v-if="!subCourse.isOpened" class="bold-span">+</span>
-                                <span v-if="subCourse.isOpened" class="bold-span">-</span>
-                                <span class="bold-span">{{subCourse.name}}</span>
+                            <div @click="showOrHideNestedElements(taskId, subTaskId)">
+                                <span v-if="!subTask.isOpened" class="bold-span">+</span>
+                                <span v-if="subTask.isOpened" class="bold-span">-</span>
+                                <span class="bold-span">{{subTask.title}}</span>
                             </div>
-                            <transition name="slide-fade">
-                                <div v-if="subCourse.isOpened">
+                            <transition name="slide-fade" v-if="subTask.childrenList !== null">
+                                <div v-if="subTask.isOpened">
                                     <div
-                                        v-for="(nestedSubCourse, nestedSubCourseId) in subCourse.works"
-                                        :key="nestedSubCourseId"
+                                        v-if="subTask.childrenList.length !== 0"
+                                        v-for="(nestedSubTask, nestedSubTaskId) in subTask.childrenList"
+                                        :key="nestedSubTaskId"
                                         class="two-nested fit-content"
                                     >
-                                        <div @click="showOrHideNestedElements(courseId, subCourseId, nestedSubCourseId)">
-                                            <span v-if="!nestedSubCourse.isOpened" class="bold-span">+</span>
-                                            <span v-if="nestedSubCourse.isOpened" class="bold-span">-</span>
-                                            <span class="bold-span">{{nestedSubCourse.name}}</span>
+                                        <div @click="showOrHideNestedElements(taskId, subTaskId, nestedSubTaskId)">
+                                            <span v-if="!nestedSubTask.isOpened" class="bold-span">+</span>
+                                            <span v-if="nestedSubTask.isOpened" class="bold-span">-</span>
+                                            <span class="bold-span">{{nestedSubTask.title}}</span>
                                         </div>
-                                        <transition name="slide-fade">
-                                            <div v-if="nestedSubCourse.isOpened" class="three-nested works-list">
-                                                <a
-                                                    :href="work.href"
-                                                    v-for="(work, workId) in nestedSubCourse.works"
-                                                    :key="workId"
-                                                    title="Перейти к работе"
+                                        <transition name="slide-fade" v-if="nestedSubTask.childrenList !== null">
+                                            <div v-if="nestedSubTask.isOpened" class="three-nested task-list">
+                                                <div
+                                                    class="task"
+                                                    v-if="nestedSubTask.childrenList.length !== 0"
+                                                    v-for="(serieObj, serieObjId) in nestedSubTask.childrenList"
+                                                    :key="serieObjId"
                                                 >
-                                                    {{work.name}}
-                                                </a>
+                                                    <a
+                                                        title="Перейти к работе"
+                                                        :href="serieObj.startCourseUrl"
+                                                        class="href-to-test"
+                                                    >
+                                                        {{serieObj.title}}
+                                                    </a>
+                                                </div>
                                             </div>
                                         </transition>
                                     </div>
@@ -72,29 +80,56 @@
 </template>
 
 <script>
-import SubjectMenu from '../../components/materials/works/SubjectsMenu';
-import ChooseWorkTypeMenu from '../../components/materials/courses/ChooseWorkTypeMenu';
+import SubjectMenu from '../../components/materials/courses/SubjectsMenu';
+import ChooseCoursesTypeMenu from '../../components/materials/courses/ChooseCoursesTypeMenu';
 
 export default {
+    beforeMount() {
+        if (this.$store.state.coursesModule.choosedSubject === null) {
+            this.$store.dispatch('getSubjectsArray')
+                .then(() => {
+                    this.$store.commit('INITIALIZE_CHOOSED_SUBJECT');
+                    this.$store.dispatch('getCoursesTypes')
+                        .then(() => {
+                            this.$store.dispatch('getCoursesArray')
+                            .then(() => {
+                                this.isLoaded = true;
+                            });
+                        });
+                });
+        } else {
+            this.$store.dispatch('getCoursesTypes')
+                .then(() => {
+                    this.$store.dispatch('getCoursesArray')
+                    .then(() => {
+                        this.isLoaded = true;
+                    });
+            });
+        }
+    },
+    beforeDestroy() {
+        this.$store.commit('CLEAR_COURSES_STATE_MODULE');
+    },
     components: {
         SubjectMenu,
-        ChooseWorkTypeMenu,
+        ChooseCoursesTypeMenu,
     },
     data() {
         return {
             isSubjectMenuShown: false,
-            isWorkTypeMenuShown: false,
+            isLoaded: false,
+            isCoursesTypeMenuShown: false,
         }
     },
     methods: {
         showSubjectMenu() {
             this.isSubjectMenuShown = true;
         },
-        showWorkTypeMenu() {
-            this.isWorkTypeMenuShown = true;
+        showCoursesTypeMenu() {
+            this.isCoursesTypeMenuShown = true;
         },
         showOrHideNestedElements() {
-            this.$store.commit('SHOW_OR_HIDE_NESTED_ELEMENTS', arguments);
+            this.$store.commit('SHOW_OR_HIDE_NESTED_COURSES', arguments);
         },
     },
 }
@@ -185,6 +220,7 @@ export default {
 
 .fit-content {
     width: fit-content;
+    margin-top: 5px;
 }
 
 .works-list > a {
@@ -194,6 +230,16 @@ export default {
 
 .works-list > a:hover {
     color:#ff8d00;
+}
+
+.href-to-test {
+    color: #898887;
+    text-decoration: none;
+}
+
+.href-to-test:hover {
+    color:#ff8d00;
+    cursor: pointer;
 }
 
 @media (max-width: 850px) {

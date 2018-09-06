@@ -31,7 +31,7 @@
                         </div>
                     </div>
                     <div class="buttons-container">
-                        <button @click="approveTeacherChanges">Назначить</button>
+                        <button @click="approveTeacherChanges()">Назначить</button>
                         <button @click="$emit('close')">Закрыть</button>
                     </div>
                 </div>

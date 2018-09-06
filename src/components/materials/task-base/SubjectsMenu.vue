@@ -3,13 +3,14 @@
         <div class="modal-mask" >
             <div class="modal-wrapper">
                 <div class="modal-container" @click="preventBubling">
-                    <h1><span>Выбор типа курса</span></h1>
+                    <h1><span>Выберите предмет</span></h1>
                     <div class="subjects-list-container">
-                        <button @click="changeChoosedWorkType('Общие курсы')">
-                            Общие курсы
-                        </button>
-                        <button @click="changeChoosedWorkType('Дополнительные курсы')">
-                            Дополнительные курсы
+                        <button
+                            v-for="(subject, subjectId) in $store.state.taskBaseModule.subjects"
+                            :key="subjectId"
+                            @click="changeChoosedSubject(subject)"
+                        >
+                            {{subject.title}}
                         </button>
                     </div>
                     <button @click="$emit('close')" class="close-button" >Закрыть</button>
@@ -26,9 +27,12 @@ export default {
         preventBubling(e) {
             e.stopPropagation();
         },
-        changeChoosedWorkType(newWorkType) {
-            this.$store.commit('CHANGE_CHOOSED_WORK_TYPE', newWorkType);
-            this.$emit('close');
+        changeChoosedSubject(newSubject) {
+            this.$store.commit('CHANGE_CHOOSED_SUBJECT', newSubject);
+            this.$store.dispatch('getTaskBaseArray')
+                .then(() => {
+                    this.$emit('close');
+                });
         },
     }
 }
@@ -63,7 +67,7 @@ export default {
     display: flex;
     flex-direction: column;
     width: 300px;
-    height: 240px;
+    height: 510px;
     margin: 0px auto;
     padding: 0;
     background-color: #fff;
@@ -116,7 +120,7 @@ export default {
     overflow: scroll;
     width: 90%;
     margin-top: 10px;
-    height: 120px;
+    height: 395px;
     margin-bottom: 5px;
 }
 

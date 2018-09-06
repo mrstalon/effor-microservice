@@ -1,5 +1,5 @@
 <template>
-    <div class="works-container">
+    <div class="works-container" v-if="$store.state.worksModule.isDataLoaded">
         <subjects-menu
             v-if="isSubjectsMenuShown"
             @close="isSubjectsMenuShown = false"
@@ -16,8 +16,20 @@
             v-if="isWorkReportsMenuShown"
             @close="isWorkReportsMenuShown = false"
         />
+        <create-work-menu
+            v-if="isCreateWorkMenuShown"
+            @close="isCreateWorkMenuShown = false"
+        />
+        <edit-work-menu
+            v-if="isEditWorkMenuShown"
+            @close="isEditWorkMenuShown = false"
+        />
+        <add-districts-menu
+            v-if="isAddDistrictsShown"
+            @close="isAddDistrictsShown = false"
+        />
         <div class="choosing-buttons-container-horisontal">
-            <button @click="showSubjectsMenu()">{{$store.state.worksModule.choosedSubject}},</button>
+            <button @click="showSubjectsMenu()">{{$store.state.worksModule.choosedSubject.title}},</button>
             <button @click="showChooseParallelMenu()" >{{$store.state.worksModule.choosedParallelNumber}} классы</button>
         </div>
         <div
@@ -25,7 +37,7 @@
             v-if="!$store.state.worksModule.isWorksCatalogMenuShown"
         >
             <button @click="showWorksCatalogMenu()" >Выбрать из каталога</button>
-            <button>Создать новую</button>
+            <button @click="showCreateWorkMenu()">Создать новую</button>
         </div>
         <table
             class="works-info-table"
@@ -36,36 +48,47 @@
                 <th>Доступ</th>
             </tr>
             <tr
-                v-for="(work, workId) in $store.state.worksModule.parallels[$store.state.worksModule.choosedParallelId].works[$store.state.worksModule.choosedSubject]"
+                v-for="(work, workId) in $store.state.worksModule.worksArray"
                 :key="workId"
             >
                 <td class="work-info-td">
                     <div class="work-info-container">
-                        <span>{{work.name}}</span>
+                        <span @click="showEditWorkMenu(work)">{{work.title}}</span>
                         <div>
-                            <span>{{work.type}};</span>
+                            <span>{{work.controlTestType}};</span>
                             <span>заданий: {{work.taskCount}};</span>
-                            <span>время: {{work.time}} мин.</span>
+                            <span>время: {{work.workTime}} мин.</span>
                         </div>
                     </div>
                     <div class="work-info-buttons-container">
                         <a
                             title="Просмотреть отчет"
-                            @click="showWorkReportsMenu(workId)"
+                            @click="showWorkReportsMenu(work)"
                         >
                             <img src="../../assets/teacher-icon.png">
                         </a>
-                        <a href="" title="Просмотреть проверочную работу">
+                        <a
+                            :href="work.startTestUrl"
+                            title="Просмотреть проверочную работу"
+                            target="_blank"
+                        >
                             <img src="../../assets/start-test.png">
                         </a>
+                        <button
+                            v-if="$store.state.appModule.isMonitoring"
+                            class="add-districts-button"
+                            @click="showAddDistrictsMenu()"
+                        >
+                            <img src="../../assets/monitoring-active.png">
+                        </button>
                     </div>
                 </td>
                 <td class="conducted-info-td">
-                    <div v-if="work.conducted">
-                        {{work.conducted}}
+                    <div v-if="work.dateStart">
+                        <button @click="showChooseDateMenu(work)" >{{work.dateStart}}</button>
                     </div>
                     <div v-else>
-                        <button @click="showChooseDateMenu(workId)" >назначить</button>
+                        <button @click="showChooseDateMenu(work)" >назначить</button>
                     </div>
                 </td>
             </tr>
@@ -129,6 +152,9 @@ import SubjectsMenu from '../../components/materials/works/SubjectsMenu';
 import ChooseParallelMenu from '../../components/materials/works/ChooseParallelMenu';
 import ChooseDateMenu from '../../components/materials/works/ChooseDateMenu';
 import WorkReportsMenu from '../../components/materials/works/WorkReportsMenu';
+import CreateWorkMenu from '../../components/materials/works/CreateWorkMenu';
+import EditWorkMenu from '../../components/materials/works/EditWorkMenu';
+import AddDistrictsMenu from '../../components/materials/works/AddDisctrictsMenu';
 
 
 export default {
@@ -137,9 +163,27 @@ export default {
         ChooseParallelMenu,
         ChooseDateMenu,
         WorkReportsMenu,
+        CreateWorkMenu,
+        EditWorkMenu,
+        AddDistrictsMenu,
     },
     beforeMount() {
-        this.$store.commit('INITIALIZE_NEEDED_DATA');
+        this.$store.dispatch('getSubjectsArray')
+            .then(() => {
+                this.$store.dispatch('getParallelNumbers')
+                    .then(() => {
+                        this.$store.commit('INITIALIZE_NEEDED_DATA');
+                        this.$store.dispatch('getWorksArray')
+                        .then(() => {
+                                this.$store.commit('CHANGE_IS_DATA_LOADED', true);
+                                this.$store.dispatch('getWorkTypes');
+                                this.$store.dispatch('getTasksTree');
+                        });
+                    });
+            });
+    },
+    beforeDestroy() {
+        this.$store.commit('CLEAR_WORK_STATE_MODULE');
     },
     data() {
         return {
@@ -147,6 +191,9 @@ export default {
             isChooseParallelMenuShown: false,
             isChooseDateMenuShown: false,
             isWorkReportsMenuShown: false,
+            isCreateWorkMenuShown: false,
+            isEditWorkMenuShown: false,
+            isAddDistrictsShown: false,
         };
     },
     methods: {
@@ -155,6 +202,9 @@ export default {
         },
         showChooseParallelMenu() {
             this.isChooseParallelMenuShown = true;
+        },
+        showAddDistrictsMenu() {
+            this.isAddDistrictsShown = true;
         },
         showWorksCatalogMenu() {
             this.$store.commit('SHOW_OR_HIDE_CATALOG_MENU');
@@ -169,16 +219,25 @@ export default {
             this.$store.commit('CLEAR_TEMP_VARIABLES');
             this.$store.commit('SHOW_OR_HIDE_CATALOG_MENU');
         },
-        showChooseDateMenu(newWorkId) {
-            this.changeChoosedWork(newWorkId);
+        showChooseDateMenu(newWork) {
+            this.changeChoosedWork(newWork);
             this.isChooseDateMenuShown = true;
         },
-        showWorkReportsMenu(newWorkId) {
-            this.changeChoosedWork(newWorkId);
+        showWorkReportsMenu(newWork) {
+            this.changeChoosedWork(newWork);
             this.isWorkReportsMenuShown = true;
         },
-        changeChoosedWork(workId) {
-            this.$store.commit('CHANGE_CHOOSED_WORK', workId);
+        showCreateWorkMenu() {
+            this.isCreateWorkMenuShown = true;
+        },
+        showEditWorkMenu(workToShow) {
+            this.$store.dispatch('getEditingWork', workToShow.id)
+                .then(() => {
+                    this.isEditWorkMenuShown = true;
+                });
+        },
+        changeChoosedWork(work) {
+            this.$store.commit('CHANGE_CHOOSED_WORK', work);
         }
     },
 }
@@ -331,11 +390,10 @@ tr {
     border: 0;
 }
 
-.work-info-buttons-container > :last-child > img {
+.work-info-buttons-container > :nth-child(2) > img {
     width: 12px;
     height: 21px;
     margin-left: 5px;
-    margin-right: 10px;
 }
 
 .work-info-buttons-container > a {
@@ -428,6 +486,26 @@ tr {
 
 .work-is-added {
     margin-left: 30px;
+}
+
+.add-districts-button > img {
+    width: 20px;
+    height: 25px;
+}
+
+.work-info-buttons-container > button {
+    -webkit-filter: grayscale(100%);
+    filter: grayscale(100%);
+    cursor: pointer;
+}
+
+.work-info-buttons-container > button:hover {
+    -webkit-filter: none;
+    filter: none;
+}
+
+.work-info-buttons-container > * {
+    margin-right: 5px;
 }
 
 @media (max-width: 850px) {

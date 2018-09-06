@@ -7,8 +7,17 @@
             </a>
             <div class="user-profile-container">
                 <button class="user-info-button" @click="showNavComponent">
-                  <img :src="$store.state.appModule.avatar" alt="Could not load an image" class="avatar-logo-img">
-                  <p>{{$store.state.appModule.userName}}</p>
+                    <img
+                        :src="$store.state.appModule.avatar"
+                        class="avatar-logo-img"
+                        v-if="$store.state.appModule.avatar"
+                    >
+                    <img
+                        src="./assets/avatar_default.png"
+                        v-if="!$store.state.appModule.avatar"
+                        class="avatar-logo-img"
+                    >
+                <p>{{$store.state.appModule.firstUserName}}</p>
                 </button>
                 <div class="user-info-button-mobile" @click="showMobileNavMenu">
                     <span></span>

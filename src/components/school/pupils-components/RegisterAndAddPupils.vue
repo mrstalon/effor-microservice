@@ -17,7 +17,7 @@
                             </select>
                             <select v-model="choosedClassLetter">
                                 <option
-                                    v-for="(classObj, classId) in $store.state.pupilsModule.parallels[choosedParallelNumber - 1].classes"
+                                    v-for="(classObj, classId) in $store.state.pupilsModule.parallels[choosedParallelId].classes"
                                     :key="classId"
                                 >
                                     {{classObj.letter}}
